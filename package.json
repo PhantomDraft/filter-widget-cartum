@@ -5,9 +5,7 @@
   "main": "dist/filterWidget.umd.js",
   "browser": "dist/filterWidget.umd.js",
   "scripts": {
-    "build:esm": "babel src --out-dir dist --copy-files",
-    "build:umd": "babel src/filterWidget.js --out-file dist/filterWidget.umd.js",
-    "build": "npm run build:esm && npm run build:umd",
+    "build": "rollup -c",
     "prepublishOnly": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -31,7 +29,9 @@
   "devDependencies": {
     "@babel/cli": "^7.27.2",
     "@babel/core": "^7.27.4",
-    "@babel/plugin-transform-modules-umd": "^7.27.1",
-    "@babel/preset-env": "^7.27.2"
+    "@babel/preset-env": "^7.27.2",
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "rollup": "^4.43.0"
   }
 }

@@ -1,17 +1,5 @@
 {
   "presets": [
     "@babel/preset-env"
-  ],
-  "plugins": [
-    [
-      "@babel/plugin-transform-modules-umd",
-      {
-        "globals": {
-          "filter-widget-cartum": "FilterWidget"
-        },
-        "exactGlobals": true,
-        "moduleId": "FilterWidget"
-      }
-    ]
   ]
 }
