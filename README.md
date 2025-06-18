@@ -11,7 +11,7 @@ Learn more on [GitHub](https://github.com/PhantomDraft/filter-widget-cartum) or 
 2. Insert the following code **before** `</body>`:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/filter-widget-cartum@1.0.11/dist/filterWidget.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/filter-widget-cartum@1.0.12/dist/filterWidget.umd.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     FilterWidget.init({
