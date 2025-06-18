@@ -62,7 +62,7 @@ class FilterRenderer {
    * @param {{[name:string]:string}} labelMap
    * @param {(opt:FilterOption)=>string} labelFormatter
    */
-  constructor(options, targetSelector, imageMap = {}) {
+  constructor(options, targetSelector, imageMap = {}, labelMap = {}, labelFormatter = null) {
     this.options       = options;
     this.targetSelector= targetSelector;
     this.imageMap      = imageMap;
