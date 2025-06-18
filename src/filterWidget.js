@@ -18,38 +18,41 @@ class FilterParser {
     this.selectors = selectors;
     this.hideZero  = Boolean(hideZero);
     console.log('[FilterParser] init selectors=', selectors, 'hideZero=', this.hideZero);
-    this._baseInjected = false;
   }
 
   parse() {
     console.log('[FilterParser] parse() start');
-    if (!this._baseInjected && this.doc.head) {
-      const baseEl = this.doc.createElement('base');
-      baseEl.setAttribute('href', window.location.origin);
-      this.doc.head.insertBefore(baseEl, this.doc.head.firstChild);
-      this._baseInjected = true;
-    }
     const out = [];
+
     const uls = this.selectors
-      .map(sel => {
-        const found = Array.from(this.doc.querySelectorAll(sel));
-        console.log(`[FilterParser] selector "${sel}" found ${found.length}`);
-        return found;
-      })
+      .map(sel => Array.from(this.doc.querySelectorAll(sel)))
       .flat();
 
     uls.forEach(ul => {
       ul.querySelectorAll('li').forEach(li => {
         const a = li.querySelector('a');
         if (!a) return;
+
         if (this.hideZero) {
           const sup = li.querySelector('sup.filter-count');
           const cnt = sup ? parseInt(sup.textContent, 10) : NaN;
           if (!isNaN(cnt) && cnt <= 0) return;
         }
+
         const titleEl = li.querySelector('span.filter-title');
         const name    = titleEl ? titleEl.textContent.trim() : a.textContent.trim();
-        out.push(new FilterOption(name, a.href));
+
+        const rawHref = a.getAttribute('href');
+        console.log('[FilterParser] rawHref:', rawHref);
+
+        let absUrl = '';
+        try {
+          absUrl = new URL(rawHref, window.location.origin).href;
+        } catch (e) {
+          console.warn('[FilterParser] cannot parse href, leaving empty:', rawHref);
+        }
+
+        out.push(new FilterOption(name, absUrl));
       });
     });
 
