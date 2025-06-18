@@ -1,0 +1,33 @@
+{
+  "name": "filter-widget-cartum",
+  "version": "1.0.0",
+  "description": "JavaScript widget for rendering catalog filters on the homepage of Cartum IO and Horoshop platforms",
+  "main": "dist/filterWidget.js",
+  "scripts": {
+    "build": "babel src --out-dir dist --copy-files",
+    "prepublishOnly": "npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PhantomDraft/filter-widget-cartum.git"
+  },
+  "keywords": [
+    "filter",
+    "widget",
+    "cartum",
+    "horoshop",
+    "phantomdraft"
+  ],
+  "author": "PD",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/PhantomDraft/filter-widget-cartum/issues"
+  },
+  "homepage": "https://github.com/PhantomDraft/filter-widget-cartum#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.27.2",
+    "@babel/core": "^7.27.4",
+    "@babel/preset-env": "^7.27.2"
+  }
+}
