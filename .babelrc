@@ -9,7 +9,8 @@
         "globals": {
           "filter-widget-cartum": "FilterWidget"
         },
-        "exactGlobals": true
+        "exactGlobals": true,
+        "moduleId": "FilterWidget"
       }
     ]
   ]
