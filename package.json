@@ -2,9 +2,12 @@
   "name": "filter-widget-cartum",
   "version": "1.0.3",
   "description": "JavaScript widget for rendering catalog filters on the homepage of Cartum IO and Horoshop platforms",
-  "main": "dist/filterWidget.js",
+  "main": "dist/filterWidget.umd.js",
+  "browser": "dist/filterWidget.umd.js",
   "scripts": {
-    "build": "babel src --out-dir dist --copy-files",
+    "build:esm": "babel src --out-dir dist --copy-files",
+    "build:umd": "babel src/filterWidget.js --out-file dist/filterWidget.umd.js",
+    "build": "npm run build:esm && npm run build:umd",
     "prepublishOnly": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
