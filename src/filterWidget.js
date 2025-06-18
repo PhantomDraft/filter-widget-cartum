@@ -18,10 +18,17 @@ class FilterParser {
     this.selectors = selectors;
     this.hideZero  = Boolean(hideZero);
     console.log('[FilterParser] init selectors=', selectors, 'hideZero=', this.hideZero);
+    this._baseInjected = false;
   }
 
   parse() {
     console.log('[FilterParser] parse() start');
+    if (!this._baseInjected && this.doc.head) {
+      const baseEl = this.doc.createElement('base');
+      baseEl.setAttribute('href', window.location.origin);
+      this.doc.head.insertBefore(baseEl, this.doc.head.firstChild);
+      this._baseInjected = true;
+    }
     const out = [];
     const uls = this.selectors
       .map(sel => {
@@ -42,9 +49,7 @@ class FilterParser {
         }
         const titleEl = li.querySelector('span.filter-title');
         const name    = titleEl ? titleEl.textContent.trim() : a.textContent.trim();
-        const rawHref = a.getAttribute('href') || '';
-        const absUrl  = new URL(rawHref, window.location.origin).href;
-        out.push(new FilterOption(name, absUrl));
+        out.push(new FilterOption(name, a.href));
       });
     });
 
