@@ -42,7 +42,9 @@ class FilterParser {
         }
         const titleEl = li.querySelector('span.filter-title');
         const name    = titleEl ? titleEl.textContent.trim() : a.textContent.trim();
-        out.push(new FilterOption(name, a.href));
+        const rawHref = a.getAttribute('href') || '';
+        const absUrl  = new URL(rawHref, window.location.origin).href;
+        out.push(new FilterOption(name, absUrl));
       });
     });
 
@@ -53,10 +55,19 @@ class FilterParser {
 
 /** Renders the options into the existing brands container */
 class FilterRenderer {
+  /**
+   * @param {FilterOption[]} options
+   * @param {string} targetSelector
+   * @param {{[name:string]:string}} imageMap
+   * @param {{[name:string]:string}} labelMap
+   * @param {(opt:FilterOption)=>string} labelFormatter
+   */
   constructor(options, targetSelector, imageMap = {}) {
     this.options       = options;
-    this.targetSelector = targetSelector;
+    this.targetSelector= targetSelector;
     this.imageMap      = imageMap;
+    this.labelMap      = labelMap;
+    this.labelFormatter= labelFormatter;
     this.container     = document.querySelector(targetSelector);
     console.log('[FilterRenderer] init target=', targetSelector, 'imageMap=', Object.keys(imageMap));
     if (!this.container) console.warn(`[FilterRenderer] target "${targetSelector}" not found`);
@@ -83,7 +94,13 @@ class FilterRenderer {
         a.appendChild(img);
       } else {
         const span = document.createElement('span');
-        span.textContent = opt.name;
+        let display = opt.name;
+        if (typeof this.labelFormatter === 'function') {
+          display = this.labelFormatter(opt);
+        } else if (this.labelMap[opt.name]) {
+          display = this.labelMap[opt.name];
+        }
+        span.textContent = display;
         span.className   = 'filter-block__label';
         a.appendChild(span);
       }
@@ -160,7 +177,13 @@ class FilterWidget {
         if (btn) btn.style.display = 'none';
       }
 
-      new FilterRenderer(opts, config.targetSelector, config.imageMap).render();
+      new FilterRenderer(
+        opts,
+        config.targetSelector,
+        config.imageMap     || {},
+        config.labelMap     || {},
+        config.labelFormatter || null
+      ).render();
     };
 
     // Fetch or use current doc
