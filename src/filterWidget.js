@@ -42,9 +42,8 @@ class FilterParser {
         const titleEl = li.querySelector('span.filter-title');
         const name    = titleEl ? titleEl.textContent.trim() : a.textContent.trim();
 
-        const absUrl = a.href;
-
-        out.push(new FilterOption(name, absUrl));
+        const rawHref = a.getAttribute('data-fake-href') || a.getAttribute('href');
+        out.push(new FilterOption(name, rawHref));
       });
     });
 
@@ -76,6 +75,7 @@ class FilterRenderer {
   render() {
     console.log('[FilterRenderer] render() start, options=', this.options.length);
     if (!this.container) return;
+    this.container.innerHTML = '';
     this.options.forEach(opt => {
       const li = document.createElement('li');
       li.className = 'frontBrands-i';
