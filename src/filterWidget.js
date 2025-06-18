@@ -42,15 +42,7 @@ class FilterParser {
         const titleEl = li.querySelector('span.filter-title');
         const name    = titleEl ? titleEl.textContent.trim() : a.textContent.trim();
 
-        const rawHref = a.getAttribute('href');
-        console.log('[FilterParser] rawHref:', rawHref);
-
-        let absUrl = '';
-        try {
-          absUrl = new URL(rawHref, window.location.origin).href;
-        } catch (e) {
-          console.warn('[FilterParser] cannot parse href, leaving empty:', rawHref);
-        }
+        const absUrl = a.href;
 
         out.push(new FilterOption(name, absUrl));
       });
