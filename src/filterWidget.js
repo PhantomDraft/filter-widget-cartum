@@ -123,6 +123,7 @@ class FilterWidget {
    * @param {string}   [config.catalogUrl]      — URL to fetch catalog HTML
    * @param {boolean}  [config.autoExpand=false]
    * @param {boolean}  [config.disableExpander=false]
+   * @param {boolean}  [config.brandLast=false]
    * @param {string|string[]} [config.runOn='home'] — 'home' | 'all' | ['/path1',...]
    */
   static init(config) {
@@ -177,13 +178,24 @@ class FilterWidget {
         if (btn) btn.style.display = 'none';
       }
 
-      new FilterRenderer(
+      const renderer = new FilterRenderer(
         opts,
         config.targetSelector,
         config.imageMap     || {},
         config.labelMap     || {},
         config.labelFormatter || null
-      ).render();
+      );
+      renderer.render();
+
+      if (config.brandLast) {
+        const container = document.querySelector(config.targetSelector);
+        container.querySelectorAll('li.frontBrands-i').forEach(li => {
+          const a = li.querySelector('a');
+          if (a && /\/filter\/brand=/.test(a.getAttribute('href') || '')) {
+            container.appendChild(li);
+          }
+        });
+      }
     };
 
     // Fetch or use current doc
