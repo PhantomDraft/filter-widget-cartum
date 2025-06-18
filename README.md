@@ -11,7 +11,7 @@ Learn more on [GitHub](https://github.com/PhantomDraft/filter-widget-cartum) or 
 2. Insert the following code **before** `</body>`:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/filter-widget-cartum@1.0.13/dist/filterWidget.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/filter-widget-cartum@1.0.15/dist/filterWidget.umd.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     FilterWidget.init({
@@ -37,6 +37,55 @@ Learn more on [GitHub](https://github.com/PhantomDraft/filter-widget-cartum) or 
 </script>
 ```
 
+Also, using the production-ready variant without inline comments:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/filter-widget-cartum@1.0.15/dist/filterWidget.umd.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    FilterWidget.init({
+      runOn           : 'home',
+      catalogUrl      : '/kontaktni-linzy/',
+      sourceSelectors : [
+        'section.filter.__listScroll .filter-list ul.filter-lv1'
+      ],
+      targetSelector  : 'section.frontBrands.__grayscale ul.frontBrands-list',
+      hideOutOfStock  : true,
+      labelMap        : {
+        '1 день'            : 'Одноденні лінзи',
+        '1 місяць'          : 'Місячні лінзи',
+        '2 тижні'           : 'Двотижневі лінзи',
+        'Світло-блакитне'   : 'Світло-блакитні лінзи',
+        'Гідрогель'         : 'Гідрогель',
+        'Силікон-гідрогель' : 'Силікон-гідрогель',
+        'CooperVision'      : 'CooperVision',
+        'Alcon'             : 'Alcon',
+        'Bausch & Lomb'     : 'Bausch & Lomb',
+        'Johnson & Johnson' : 'Johnson & Johnson',
+        'Гнучкий'           : 'Гнучкі лінзи',
+        'Денний'            : 'Денні лінзи',
+        'Пролонгований'     : 'Пролонговані лінзи'
+      },
+      labelFormatter  : opt => {
+        const u = opt.url;
+        if (u.includes('uvFltr=')) return opt.name === 'Ні' ? 'Без UV-фільтра' : 'З UV-фільтром';
+        if (u.includes('tonuvannja=')) return opt.name === 'Ні' ? 'Без тонування' : opt.name;
+        return opt.name;
+      },
+      imageMap        : {
+        'CooperVision' : '/images/brands/CooperVision.png',
+        'Alcon' : '/images/brands/Alcon.png',
+        'Bausch & Lomb' : '/images/brands/Bausch&Lomb.png',
+        'Johnson & Johnson' : '/images/brands/Johnson&Johnson.png'
+      },
+      autoExpand      : true,
+      disableExpander : false,
+      brandLast       : true
+    });
+  });
+</script>
+```
+
 ---
 
 ## Configuration Options
@@ -56,6 +105,7 @@ Learn more on [GitHub](https://github.com/PhantomDraft/filter-widget-cartum) or 
 | `imageMap`                                    | `Record<string,string>`        | Mapping from option names (usually brands) to image URLs (logos).                                         |
 | `autoExpand`                                  | `boolean`                      | `true` to remove inline height/overflow and `. __toggle` class so that all items are immediately visible. |
 | `disableExpander`                             | `boolean`                      | `true` to hide the “Show more” expander button permanently.                                               |
+| `brandLast`                                   | `boolean`                      | `true` to move all “brand” blocks (URLs containing `/filter/brand=`) to the end of the rendered list.     |
 
 ---
 
