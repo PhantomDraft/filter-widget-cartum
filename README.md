@@ -1,27 +1,37 @@
 # FilterWidget.js
 
 JavaScript widget for rendering catalog filters on the homepage of Cartum IO and Horoshop e-commerce sites.
-
-**Learn more on [GitHub](https://github.com/PhantomDraft/filter-widget-cartum) or install via [npm](https://www.npmjs.com/package/filter-widget-cartum).**
+Learn more on [GitHub](https://github.com/PhantomDraft/filter-widget-cartum) or install via [npm](https://www.npmjs.com/package/filter-widget-cartum).
 
 ---
 
 ## Installation and Setup
 
-Insert the following code into the platform’s admin panel (Settings → General Settings → Scripts → Before `</body>`):
+1. In your platform’s admin panel (Site → Design → Design Editor), make sure to place a **“Brands”** block—this is what the widget replaces by default.
+2. Insert the following code **before** `</body>`:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/filter-widget-cartum@1.0.0/dist/filterWidget.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/filter-widget-cartum@1.0.11/dist/filterWidget.umd.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     FilterWidget.init({
-      sourceSelectors: ['.filter__listScroll'],
-      targetSelector : '.frontBrands.__grayscale',
-      hideOutOfStock : true,  // hides options with no stock
-      imageMap       : {      // brand logos
-        'Canon': '/images/brands/canon.png',
-        'Nikon': '/images/brands/nikon.png'
-      }
+      runOn           : 'home',                    // 'home' | 'all' | [ '/path1', '/path2' ]
+      catalogUrl      : '/kontaktni-linzy/',       // URL to fetch catalog filters from
+      sourceSelectors : [
+        'section.filter.__listScroll .filter-list ul.filter-lv1'
+      ],
+      targetSelector  : 'section.frontBrands.__grayscale ul.frontBrands-list',
+      hideOutOfStock  : true,                      // hide options with zero items
+      labelMap        : {                          // override displayed labels
+        '1 день'   : 'Одноденні лінзи',
+        '1 місяць' : 'Місячні лінзи'
+      },
+      imageMap        : {                          // brand logo URLs
+        'Canon' : '/images/brands/canon.png',
+        'Nikon' : '/images/brands/nikon.png'
+      },
+      autoExpand      : true,                      // remove height/overflow toggle
+      disableExpander : false                      // hide “Show more” button
     });
   });
 </script>
@@ -31,12 +41,21 @@ Insert the following code into the platform’s admin panel (Settings → Genera
 
 ## Configuration Options
 
-| Option            | Type       | Description                                                                                         |
-| ----------------- | ---------- | --------------------------------------------------------------------------------------------------- |
-| `sourceSelectors` | `string[]` | CSS selectors of containers with filter lists, e.g. `['.filter__listScroll']` or `['all']`.         |
-| `targetSelector`  | `string`   | CSS selector of the homepage container where blocks will be added, e.g. `.frontBrands.__grayscale`. |
-| `hideOutOfStock`  | `boolean`  | `true` to hide options with zero stock; `false` to show all.                                        |
-| `imageMap`        | `object`   | Mapping of option names to image URLs (used for brand logos).                                       |
+| Option                                        | Type                           | Description                                                                                               |
+| --------------------------------------------- | ------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| `runOn`                                       | `string` \| `string[]`         | Where to run the widget:                                                                                  |
+| • `'home'` — only on `/`                      |                                |                                                                                                           |
+| • `'all'` — on every page                     |                                |                                                                                                           |
+| • `['/path1','/path2']` — only on those paths |                                |                                                                                                           |
+| `catalogUrl`                                  | `string`                       | URL of the catalog page to fetch filters from (relative or absolute).                                     |
+| `sourceSelectors`                             | `string[]`                     | CSS selectors targeting the original filter-list containers, e.g. `['.filter__listScroll']`.              |
+| `targetSelector`                              | `string`                       | CSS selector of the “Brands” `<ul>` to replace, e.g. `'.frontBrands.__grayscale ul.frontBrands-list'`.    |
+| `hideOutOfStock`                              | `boolean`                      | `true` to omit options with zero count; `false` to show all.                                              |
+| `labelMap`                                    | `Record<string,string>`        | Mapping from original option names to custom labels.                                                      |
+| `labelFormatter`                              | `(option) ⇒ string` (optional) | Function that receives a `FilterOption` and returns a custom label; overrides `labelMap`.                 |
+| `imageMap`                                    | `Record<string,string>`        | Mapping from option names (usually brands) to image URLs (logos).                                         |
+| `autoExpand`                                  | `boolean`                      | `true` to remove inline height/overflow and `. __toggle` class so that all items are immediately visible. |
+| `disableExpander`                             | `boolean`                      | `true` to hide the “Show more” expander button permanently.                                               |
 
 ---
 
@@ -63,7 +82,7 @@ Insert the following code into the platform’s admin panel (Settings → Genera
   filter: grayscale(100%);
   transition: filter 0.3s;
 }
-.filter-block__img:hover {
+.filter-block:hover .filter-block__img {
   filter: none;
 }
 .filter-block__label {
@@ -76,15 +95,15 @@ Insert the following code into the platform’s admin panel (Settings → Genera
 
 ## Security
 
-* Uses only `textContent` and `createElement` to prevent XSS.
-* Sets `rel="nofollow"` on external links.
-* Errors are caught in `try/catch` so the widget won’t break the page.
-* All input parameters are validated in `validateConfig()`.
+* Only uses `textContent`, `createElement` and URL APIs—no innerHTML, preventing XSS.
+* Links are given `rel="nofollow"`.
+* Errors are caught so the widget won’t break your page.
+* All configuration parameters are validated on init.
 
 ---
 
 ## Extending and Customization
 
-* To add new filter rules, specify additional selectors in `sourceSelectors`.
-* To extend `imageMap`, add new name→URL pairs.
-* To integrate custom logic, add your own functions and call them after parsing.
+* To capture additional filter groups, add more selectors to `sourceSelectors`.
+* To supply custom logos or labels, extend `imageMap` and `labelMap` or provide a `labelFormatter`.
+* For advanced logic, invoke your own functions after parsing or wrap widget init in your own script.
