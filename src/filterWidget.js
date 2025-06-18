@@ -181,4 +181,8 @@ class FilterWidget {
   }
 }
 
+if (typeof window !== 'undefined' && window.FilterWidget && window.FilterWidget.default) {
+  window.FilterWidget = window.FilterWidget.default;
+}
+
 export default FilterWidget;
