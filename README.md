@@ -27,8 +27,8 @@ Learn more on [GitHub](https://github.com/PhantomDraft/filter-widget-cartum) or 
         '1 місяць' : 'Місячні лінзи'
       },
       imageMap        : {                          // brand logo URLs
-        'Canon' : '/images/brands/canon.png',
-        'Nikon' : '/images/brands/nikon.png'
+        'CooperVision' : '/images/brands/CooperVision.png',
+        'Alcon' : '/images/brands/Alcon.png'
       },
       autoExpand      : true,                      // remove height/overflow toggle
       disableExpander : false                      // hide “Show more” button
