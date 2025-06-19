@@ -78,11 +78,11 @@ class FilterRenderer {
 
     const generalUl = document.createElement('ul');
     generalUl.className = 'frontBrands-list';
-    generalUl.style.overflow = 'visible';
+    generalUl.style.cssText = 'overflow: visible; height: 120px;';
 
     const brandUl = document.createElement('ul');
     brandUl.className = 'frontBrands-list';
-    brandUl.style.overflow = 'visible';
+    brandUl.style.cssText = 'overflow: visible; height: 120px;';
 
     this.options.forEach(opt => {
       const li = document.createElement('li');
