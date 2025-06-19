@@ -1,5 +1,5 @@
 {
-  "name": "@pan-canon/filter-widget-cartum",
+  "name": "filter-widget-cartum",
   "version": "1.0.17",
   "author": "PD",
   "description": "JavaScript widget for rendering catalog filters on the homepage of Cartum IO and Horoshop platforms",
