@@ -1,6 +1,6 @@
 {
   "name": "filter-widget-cartum",
-  "version": "1.0.23",
+  "version": "1.0.24",
   "author": "PD",
   "description": "JavaScript widget for rendering catalog filters on the homepage of Cartum IO and Horoshop platforms",
   "main": "dist/filterWidget.umd.js",
