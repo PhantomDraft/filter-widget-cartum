@@ -75,21 +75,31 @@ class FilterRenderer {
   render() {
     console.log('[FilterRenderer] render() start, options=', this.options.length);
     if (!this.container) return;
+
     this.container.innerHTML = '';
+
+    const generalUl = document.createElement('ul');
+    generalUl.className = 'frontBrands-list';
+    generalUl.style.cssText = 'overflow: visible; height: 120px;';
+
+    const brandUl = document.createElement('ul');
+    brandUl.className = 'frontBrands-list';
+    brandUl.style.cssText = 'overflow: visible; height: 120px;';
+
     this.options.forEach(opt => {
       const li = document.createElement('li');
       li.className = 'frontBrands-i';
 
       const a = document.createElement('a');
-      a.href      = opt.url;
-      a.rel       = 'nofollow';
+      a.href = opt.url;
+      a.rel = 'nofollow';
       a.className = 'frontBrands-a filter-block';
-      a.title     = opt.name;
+      a.title = opt.name;
 
       if (this.imageMap[opt.name]) {
         const img = document.createElement('img');
-        img.src       = this.imageMap[opt.name];
-        img.alt       = opt.name;
+        img.src = this.imageMap[opt.name];
+        img.alt = opt.name;
         img.className = 'frontBrands-img filter-block__img';
         a.appendChild(img);
       } else {
@@ -101,13 +111,26 @@ class FilterRenderer {
           display = this.labelMap[opt.name];
         }
         span.textContent = display;
-        span.className   = 'filter-block__label';
+        span.className = 'filter-block__label';
         a.appendChild(span);
       }
 
       li.appendChild(a);
-      this.container.appendChild(li);
+
+      if (/\/filter\/brand=/.test(opt.url)) {
+        brandUl.appendChild(li);
+      } else {
+        generalUl.appendChild(li);
+      }
     });
+
+    if (generalUl.children.length > 0) {
+      this.container.appendChild(generalUl);
+    }
+    if (brandUl.children.length > 0) {
+      this.container.appendChild(brandUl);
+    }
+
     console.log('[FilterRenderer] render() done');
   }
 }
