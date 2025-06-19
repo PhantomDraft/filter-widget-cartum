@@ -76,8 +76,6 @@ class FilterRenderer {
     console.log('[FilterRenderer] render() start, options=', this.options.length);
     if (!this.container) return;
 
-    this.container.innerHTML = '';
-
     const generalUl = document.createElement('ul');
     generalUl.className = 'frontBrands-list';
     generalUl.style.cssText = 'overflow: visible; height: 120px;';
@@ -124,12 +122,10 @@ class FilterRenderer {
       }
     });
 
-    if (generalUl.children.length > 0) {
-      this.container.appendChild(generalUl);
-    }
-    if (brandUl.children.length > 0) {
-      this.container.appendChild(brandUl);
-    }
+    // Вставляем списки после текущего контейнера, затем удаляем его
+    this.container.after(generalUl);
+    this.container.after(brandUl);
+    this.container.remove();
 
     console.log('[FilterRenderer] render() done');
   }
