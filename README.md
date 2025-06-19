@@ -1,7 +1,7 @@
 # FilterWidget.js
 
 JavaScript widget for rendering catalog filters on the homepage of Cartum IO and Horoshop e-commerce sites.
-Learn more on [GitHub](https://github.com/PhantomDraft/filter-widget-cartum) or install via [npm](https://www.npmjs.com/package/filter-widget-cartum).
+Learn more on [GitHub](https://github.com/PhantomDraft/filter-widget-cartum) or install via [npm](https://www.npmjs.com/package/@pan-canon/filter-widget-cartum).
 
 ---
 
@@ -11,7 +11,7 @@ Learn more on [GitHub](https://github.com/PhantomDraft/filter-widget-cartum) or 
 2. Insert the following code **before** `</body>`:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/filter-widget-cartum@1.0.16/dist/filterWidget.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@pan-canon/filter-widget-cartum@1.0.17/dist/filterWidget.umd.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     FilterWidget.init({
@@ -40,7 +40,7 @@ Learn more on [GitHub](https://github.com/PhantomDraft/filter-widget-cartum) or 
 Also, using the production-ready variant without inline comments:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/filter-widget-cartum@1.0.16/dist/filterWidget.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@pan-canon/filter-widget-cartum@1.0.17/dist/filterWidget.umd.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     FilterWidget.init({
@@ -127,8 +127,10 @@ Also, using the production-ready variant without inline comments:
   background: #e0e0e0;
 }
 .filter-block__img {
-  max-width: 100px;
-  max-height: 100px;
+  width: 100px;
+  height: 100px;
+  object-fit: fill;
+  object-position: center center;
   filter: grayscale(100%);
   transition: filter 0.3s;
 }
@@ -156,4 +158,5 @@ Also, using the production-ready variant without inline comments:
 
 * To capture additional filter groups, add more selectors to `sourceSelectors`.
 * To supply custom logos or labels, extend `imageMap` and `labelMap` or provide a `labelFormatter`.
+* **Note:** You can obtain filter cover URLs by right-clicking the cover image in Products → References → Brands and selecting “Copy image address”.
 * For advanced logic, invoke your own functions after parsing or wrap widget init in your own script.
