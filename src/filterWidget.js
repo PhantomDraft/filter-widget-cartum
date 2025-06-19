@@ -23,30 +23,22 @@ class FilterParser {
   parse() {
     console.log('[FilterParser] parse() start');
     const out = [];
-
-    const uls = this.selectors
-      .map(sel => Array.from(this.doc.querySelectorAll(sel)))
-      .flat();
-
+    const uls = this.selectors.map(sel => Array.from(this.doc.querySelectorAll(sel))).flat();
     uls.forEach(ul => {
       ul.querySelectorAll('li').forEach(li => {
         const a = li.querySelector('a');
         if (!a) return;
-
         if (this.hideZero) {
           const sup = li.querySelector('sup.filter-count');
           const cnt = sup ? parseInt(sup.textContent, 10) : NaN;
           if (!isNaN(cnt) && cnt <= 0) return;
         }
-
         const titleEl = li.querySelector('span.filter-title');
         const name    = titleEl ? titleEl.textContent.trim() : a.textContent.trim();
-
         const rawHref = a.getAttribute('data-fake-href') || a.getAttribute('href');
         out.push(new FilterOption(name, rawHref));
       });
     });
-
     console.log('[FilterParser] parse() result count=', out.length);
     return out;
   }
@@ -61,14 +53,16 @@ class FilterRenderer {
    * @param {{[name:string]:string}} labelMap
    * @param {(opt:FilterOption)=>string} labelFormatter
    * @param {boolean} brandLast
+   * @param {boolean} autoExpand
    */
-  constructor(options, targetSelector, imageMap = {}, labelMap = {}, labelFormatter = null, brandLast = false) {
+  constructor(options, targetSelector, imageMap = {}, labelMap = {}, labelFormatter = null, brandLast = false, autoExpand = false) {
     this.options       = options;
     this.targetSelector= targetSelector;
     this.imageMap      = imageMap;
     this.labelMap      = labelMap;
     this.labelFormatter= labelFormatter;
     this.brandLast     = brandLast;
+    this.autoExpand    = autoExpand;
     this.container     = document.querySelector(targetSelector);
     console.log('[FilterRenderer] init target=', targetSelector, 'imageMap=', Object.keys(imageMap));
     if (!this.container) console.warn(`[FilterRenderer] target "${targetSelector}" not found`);
@@ -77,29 +71,28 @@ class FilterRenderer {
   render() {
     console.log('[FilterRenderer] render() start, options=', this.options.length);
     if (!this.container) return;
-
     const parent = this.container.parentNode;
     this.container.remove();
 
-    if (this.brandLast) {
-      const generalUl = document.createElement('ul');
-      generalUl.className = 'frontBrands-list __collapsed';
-      const brandUl = document.createElement('ul');
-      brandUl.className = 'frontBrands-list __collapsed';
+    const createList = () => {
+      const ul = document.createElement('ul');
+      ul.className = 'frontBrands-list __collapsed';
+      return ul;
+    };
 
+    let lists = [];
+    if (this.brandLast) {
+      const generalUl = createList();
+      const brandUl   = createList();
       this.options.forEach(opt => {
-        const li = document.createElement('li');
-        li.className = 'frontBrands-i';
-        // создаём <a> и наполняем
+        const li = document.createElement('li'); li.className = 'frontBrands-i';
         const a = document.createElement('a');
-        a.href = opt.url;
-        a.rel  = 'nofollow';
+        a.href = opt.url; a.rel = 'nofollow';
         a.className = 'frontBrands-a filter-block';
         a.title = opt.name;
         if (this.imageMap[opt.name]) {
           const img = document.createElement('img');
-          img.src       = this.imageMap[opt.name];
-          img.alt       = opt.name;
+          img.src = this.imageMap[opt.name]; img.alt = opt.name;
           img.className = 'frontBrands-img filter-block__img';
           a.appendChild(img);
         } else {
@@ -107,50 +100,53 @@ class FilterRenderer {
           let display = opt.name;
           if (typeof this.labelFormatter === 'function') display = this.labelFormatter(opt);
           else if (this.labelMap[opt.name]) display = this.labelMap[opt.name];
-          span.textContent = display;
-          span.className   = 'filter-block__label';
+          span.textContent = display; span.className = 'filter-block__label';
           a.appendChild(span);
         }
         li.appendChild(a);
-
-        if (/\/filter\/brand=/.test(opt.url)) brandUl.appendChild(li);
-        else generalUl.appendChild(li);
+        (/\/filter\/brand=/.test(opt.url) ? brandUl : generalUl).appendChild(li);
       });
-
-      parent.appendChild(generalUl);
-      parent.appendChild(brandUl);
+      lists = [generalUl, brandUl];
     } else {
-      const singleUl = document.createElement('ul');
-      singleUl.className = 'frontBrands-list __collapsed';
-
+      const singleUl = createList();
       this.options.forEach(opt => {
-        const li = document.createElement('li');
-        li.className = 'frontBrands-i';
+        const li = document.createElement('li'); li.className = 'frontBrands-i';
         const a = document.createElement('a');
-        a.href = opt.url;
-        a.rel  = 'nofollow';
+        a.href = opt.url; a.rel = 'nofollow';
         a.className = 'frontBrands-a filter-block';
         a.title = opt.name;
         if (this.imageMap[opt.name]) {
-          const img = document.createElement('img');
-          img.src       = this.imageMap[opt.name];
-          img.alt       = opt.name;
-          img.className = 'frontBrands-img filter-block__img';
-          a.appendChild(img);
+          const img = document.createElement('img'); img.src = this.imageMap[opt.name]; img.alt = opt.name;
+          img.className = 'frontBrands-img filter-block__img'; a.appendChild(img);
         } else {
           const span = document.createElement('span');
           let display = opt.name;
           if (typeof this.labelFormatter === 'function') display = this.labelFormatter(opt);
           else if (this.labelMap[opt.name]) display = this.labelMap[opt.name];
-          span.textContent = display;
-          span.className   = 'filter-block__label';
-          a.appendChild(span);
+          span.textContent = display; span.className = 'filter-block__label'; a.appendChild(span);
         }
         li.appendChild(a);
         singleUl.appendChild(li);
       });
+      lists = [singleUl];
+    }
 
-      parent.appendChild(singleUl);
+    lists.forEach(ul => parent.appendChild(ul));
+
+    if (!this.autoExpand) {
+      const expander = document.createElement('div');
+      expander.className = 'frontBrands-expander';
+      const btn = document.createElement('a');
+      btn.href = '#'; btn.textContent = 'Показать всё';
+      btn.addEventListener('click', e => {
+        e.preventDefault();
+        lists.forEach(ul => ul.classList.replace('__collapsed', '__expanded'));
+        expander.remove();
+      });
+      expander.appendChild(btn);
+      parent.appendChild(expander);
+    } else {
+      lists.forEach(ul => ul.classList.replace('__collapsed', '__expanded'));
     }
 
     console.log('[FilterRenderer] render() done');
@@ -167,7 +163,6 @@ class FilterWidget {
    * @param {{[name:string]:string}} [config.imageMap={}]
    * @param {string}   [config.catalogUrl]
    * @param {boolean}  [config.autoExpand=false]
-   * @param {boolean}  [config.disableExpander=false]
    * @param {boolean}  [config.brandLast=false]
    * @param {string|string[]} [config.runOn='home']
    */
@@ -188,21 +183,14 @@ class FilterWidget {
       const opts = new FilterParser(doc, config.sourceSelectors, config.hideOutOfStock).parse();
       const target = document.querySelector(config.targetSelector);
       if (!target) return;
-      if (config.autoExpand) {
-        target.classList.remove('__collapsed');
-        target.classList.add('__expanded');
-      }
-      if (config.disableExpander) {
-        const btn = document.querySelector('.frontBrands-expander a');
-        if (btn) btn.classList.add('hidden');
-      }
       const renderer = new FilterRenderer(
         opts,
         config.targetSelector,
         config.imageMap     || {},
         config.labelMap     || {},
         config.labelFormatter || null,
-        config.brandLast
+        config.brandLast,
+        config.autoExpand
       );
       renderer.render();
     };
