@@ -54,8 +54,9 @@ class FilterRenderer {
    * @param {(opt:FilterOption)=>string} labelFormatter
    * @param {boolean} brandLast
    * @param {boolean} autoExpand
+   * @param {string} expanderText
    */
-  constructor(options, targetSelector, imageMap = {}, labelMap = {}, labelFormatter = null, brandLast = false, autoExpand = false) {
+  constructor(options, targetSelector, imageMap = {}, labelMap = {}, labelFormatter = null, brandLast = false, autoExpand = false, expanderText = 'Expand') {
     this.options       = options;
     this.targetSelector= targetSelector;
     this.imageMap      = imageMap;
@@ -63,6 +64,7 @@ class FilterRenderer {
     this.labelFormatter= labelFormatter;
     this.brandLast     = brandLast;
     this.autoExpand    = autoExpand;
+    this.expanderText  = expanderText;
     this.container     = document.querySelector(targetSelector);
     console.log('[FilterRenderer] init target=', targetSelector, 'imageMap=', Object.keys(imageMap));
     if (!this.container) console.warn(`[FilterRenderer] target "${targetSelector}" not found`);
@@ -74,6 +76,7 @@ class FilterRenderer {
     const parent = this.container.parentNode;
     this.container.remove();
 
+    // Helper to create a collapsed UL
     const createList = () => {
       const ul = document.createElement('ul');
       ul.className = 'frontBrands-list __collapsed';
@@ -86,10 +89,9 @@ class FilterRenderer {
       const brandUl   = createList();
       this.options.forEach(opt => {
         const li = document.createElement('li'); li.className = 'frontBrands-i';
-        const a = document.createElement('a');
+        const a  = document.createElement('a');
         a.href = opt.url; a.rel = 'nofollow';
-        a.className = 'frontBrands-a filter-block';
-        a.title = opt.name;
+        a.className = 'frontBrands-a filter-block'; a.title = opt.name;
         if (this.imageMap[opt.name]) {
           const img = document.createElement('img');
           img.src = this.imageMap[opt.name]; img.alt = opt.name;
@@ -111,10 +113,9 @@ class FilterRenderer {
       const singleUl = createList();
       this.options.forEach(opt => {
         const li = document.createElement('li'); li.className = 'frontBrands-i';
-        const a = document.createElement('a');
+        const a  = document.createElement('a');
         a.href = opt.url; a.rel = 'nofollow';
-        a.className = 'frontBrands-a filter-block';
-        a.title = opt.name;
+        a.className = 'frontBrands-a filter-block'; a.title = opt.name;
         if (this.imageMap[opt.name]) {
           const img = document.createElement('img'); img.src = this.imageMap[opt.name]; img.alt = opt.name;
           img.className = 'frontBrands-img filter-block__img'; a.appendChild(img);
@@ -131,13 +132,15 @@ class FilterRenderer {
       lists = [singleUl];
     }
 
+    // Append lists
     lists.forEach(ul => parent.appendChild(ul));
 
+    // Expander logic
     if (!this.autoExpand) {
       const expander = document.createElement('div');
       expander.className = 'frontBrands-expander';
       const btn = document.createElement('a');
-      btn.href = '#'; btn.textContent = 'Показать всё';
+      btn.href = '#'; btn.textContent = this.expanderText;
       btn.addEventListener('click', e => {
         e.preventDefault();
         lists.forEach(ul => ul.classList.replace('__collapsed', '__expanded'));
@@ -164,6 +167,7 @@ class FilterWidget {
    * @param {string}   [config.catalogUrl]
    * @param {boolean}  [config.autoExpand=false]
    * @param {boolean}  [config.brandLast=false]
+   * @param {string}   [config.expanderText='Expand']
    * @param {string|string[]} [config.runOn='home']
    */
   static init(config) {
@@ -190,7 +194,8 @@ class FilterWidget {
         config.labelMap     || {},
         config.labelFormatter || null,
         config.brandLast,
-        config.autoExpand
+        config.autoExpand,
+        config.expanderText || 'Expand'
       );
       renderer.render();
     };

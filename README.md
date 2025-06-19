@@ -11,27 +11,28 @@ Learn more on [GitHub](https://github.com/PhantomDraft/filter-widget-cartum) or 
 2. Insert the following code **before** `</body>`:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/filter-widget-cartum@1.0.23/dist/filterWidget.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/filter-widget-cartum@1.0.25/dist/filterWidget.umd.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     FilterWidget.init({
-      runOn           : 'home',                    // 'home' | 'all' | [ '/path1', '/path2' ]
-      catalogUrl      : '/kontaktni-linzy/',       // URL to fetch catalog filters from
-      sourceSelectors : [
+      runOn          : 'home',                             // 'home' | 'all' | [ '/path1', '/path2' ]
+      catalogUrl     : '/kontaktni-linzy/',                  // URL to fetch catalog filters from
+      sourceSelectors: [
         'section.filter.__listScroll .filter-list ul.filter-lv1'
       ],
-      targetSelector  : 'section.frontBrands.__grayscale ul.frontBrands-list',
-      hideOutOfStock  : true,                      // hide options with zero items
-      labelMap        : {                          // override displayed labels
+      targetSelector : 'section.frontBrands.__grayscale ul.frontBrands-list',
+      hideOutOfStock : true,                                 // hide options with zero items
+      labelMap       : {                                     // override displayed labels
         '1 день'   : 'Одноденні лінзи',
         '1 місяць' : 'Місячні лінзи'
       },
-      imageMap        : {                          // brand logo URLs
-        'CooperVision' : '/images/brands/CooperVision.png',
-        'Alcon' : '/images/brands/Alcon.png'
+      imageMap       : {                                     // brand logo URLs
+        'CooperVision': '/images/brands/CooperVision.png',
+        'Alcon'       : '/images/brands/Alcon.png'
       },
-      autoExpand      : true,                      // remove height/overflow toggle
-      disableExpander : false                      // hide “Show more” button
+      autoExpand     : false,                                // false = show only one row + expander button; true = show all items
+      expanderText   : 'Показать ещё',                      // text for expander button when autoExpand is false
+      brandLast      : true                                  // render brands group after general filters
     });
   });
 </script>
@@ -40,18 +41,18 @@ Learn more on [GitHub](https://github.com/PhantomDraft/filter-widget-cartum) or 
 Also, using the production-ready variant without inline comments:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/filter-widget-cartum@1.0.23/dist/filterWidget.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/filter-widget-cartum@1.0.25/dist/filterWidget.umd.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     FilterWidget.init({
-      runOn           : 'home',
-      catalogUrl      : '/kontaktni-linzy/',
-      sourceSelectors : [
+      runOn          : 'home',                 
+      catalogUrl     : '/kontaktni-linzy/',     
+      sourceSelectors: [
         'section.filter.__listScroll .filter-list ul.filter-lv1'
       ],
-      targetSelector  : 'section.frontBrands.__grayscale ul.frontBrands-list',
-      hideOutOfStock  : true,
-      labelMap        : {
+      targetSelector : 'section.frontBrands.__grayscale ul.frontBrands-list',
+      hideOutOfStock : true,
+      labelMap       : {
         '1 день'            : 'Одноденні лінзи',
         '1 місяць'          : 'Місячні лінзи',
         '2 тижні'           : 'Двотижневі лінзи',
@@ -66,21 +67,21 @@ Also, using the production-ready variant without inline comments:
         'Денний'            : 'Денні лінзи',
         'Пролонгований'     : 'Пролонговані лінзи'
       },
-      labelFormatter  : opt => {
+      labelFormatter : opt => {
         const u = opt.url;
-        if (u.includes('uvFltr=')) return opt.name === 'Ні' ? 'Без UV-фільтра' : 'З UV-фільтром';
-        if (u.includes('tonuvannja=')) return opt.name === 'Ні' ? 'Без тонування' : opt.name;
+        if (u.includes('uvFltr='))   return opt.name === 'Ні' ? 'Без UV-фільтра' : 'З UV-фільтром';
+        if (u.includes('tonuvannja=')) return opt.name === 'Ні' ? 'Без тонування'   : opt.name;
         return opt.name;
       },
-      imageMap        : {
-        'CooperVision' : '/images/brands/CooperVision.png',
-        'Alcon' : '/images/brands/Alcon.png',
-        'Bausch & Lomb' : '/images/brands/Bausch&Lomb.png',
-        'Johnson & Johnson' : '/images/brands/Johnson&Johnson.png'
+      imageMap       : {
+        'CooperVision'       : '/images/brands/CooperVision.png',
+        'Alcon'              : '/images/brands/Alcon.png',
+        'Bausch & Lomb'      : '/images/brands/Bausch&Lomb.png',
+        'Johnson & Johnson'  : '/images/brands/Johnson&Johnson.png'
       },
-      autoExpand      : true,
-      disableExpander : false,
-      brandLast       : true
+      autoExpand     : true,
+      expanderText   : 'Розгорнути',
+      brandLast      : true
     });
   });
 </script>
@@ -90,22 +91,19 @@ Also, using the production-ready variant without inline comments:
 
 ## Configuration Options
 
-| Option                                        | Type                           | Description                                                                                               |
-| --------------------------------------------- | ------------------------------ | --------------------------------------------------------------------------------------------------------- |
-| `runOn`                                       | `string` \| `string[]`         | Where to run the widget:                                                                                  |
-| • `'home'` — only on `/`                      |                                |                                                                                                           |
-| • `'all'` — on every page                     |                                |                                                                                                           |
-| • `['/path1','/path2']` — only on those paths |                                |                                                                                                           |
-| `catalogUrl`                                  | `string`                       | URL of the catalog page to fetch filters from (relative or absolute).                                     |
-| `sourceSelectors`                             | `string[]`                     | CSS selectors targeting the original filter-list containers, e.g. `['.filter__listScroll']`.              |
-| `targetSelector`                              | `string`                       | CSS selector of the “Brands” `<ul>` to replace, e.g. `'.frontBrands.__grayscale ul.frontBrands-list'`.    |
-| `hideOutOfStock`                              | `boolean`                      | `true` to omit options with zero count; `false` to show all.                                              |
-| `labelMap`                                    | `Record<string,string>`        | Mapping from original option names to custom labels.                                                      |
-| `labelFormatter`                              | `(option) ⇒ string` (optional) | Function that receives a `FilterOption` and returns a custom label; overrides `labelMap`.                 |
-| `imageMap`                                    | `Record<string,string>`        | Mapping from option names (usually brands) to image URLs (logos).                                         |
-| `autoExpand`                                  | `boolean`                      | `true` to remove inline height/overflow and `. __toggle` class so that all items are immediately visible. |
-| `disableExpander`                             | `boolean`                      | `true` to hide the “Show more” expander button permanently.                                               |
-| `brandLast`                                   | `boolean`                      | `true` to move all “brand” blocks (URLs containing `/filter/brand=`) to the end of the rendered list.     |
+| Option            | Type                    | Description                                                                                    |
+| ----------------- | ----------------------- | ---------------------------------------------------------------------------------------------- |
+| `runOn`           | `string` \| `string[]`  | Where to run the widget: `'home'`, `'all'`, or specific paths.                                 |
+| `catalogUrl`      | `string`                | URL of the catalog page to fetch filters from.                                                 |
+| `sourceSelectors` | `string[]`              | CSS selectors targeting original filter lists.                                                 |
+| `targetSelector`  | `string`                | CSS selector of the `<ul>` to replace with rendered filters.                                   |
+| `hideOutOfStock`  | `boolean`               | `true` to omit zero-count options.                                                             |
+| `labelMap`        | `Record<string,string>` | Custom label overrides.                                                                        |
+| `labelFormatter`  | `(option) ⇒ string`     | Function returning label per option; overrides `labelMap`.                                     |
+| `imageMap`        | `Record<string,string>` | Mapping option names to logo image URLs.                                                       |
+| `autoExpand`      | `boolean`               | `false` = render a single collapsed row + expander button; `true` = render all items expanded. |
+| `expanderText`    | `string`                | Text of the “Show more” button when `autoExpand` is `false`.                                   |
+| `brandLast`       | `boolean`               | `true` to render brand filters in a separate second list after general filters.                |
 
 ---
 
@@ -141,6 +139,19 @@ Also, using the production-ready variant without inline comments:
   font-size: 14px;
   color: #333;
 }
+.frontBrands-list.__collapsed {
+  max-height: 120px;
+  overflow: hidden;
+}
+.frontBrands-list.__expanded {
+  max-height: none;
+  overflow: visible;
+}
+.frontBrands-expander a {
+  display: inline-block;
+  margin: 8px;
+  cursor: pointer;
+}
 ```
 
 ---
@@ -150,13 +161,13 @@ Also, using the production-ready variant without inline comments:
 * Only uses `textContent`, `createElement` and URL APIs—no innerHTML, preventing XSS.
 * Links are given `rel="nofollow"`.
 * Errors are caught so the widget won’t break your page.
-* All configuration parameters are validated on init.
+* All parameters validated on init.
 
 ---
 
 ## Extending and Customization
 
-* To capture additional filter groups, add more selectors to `sourceSelectors`.
-* To supply custom logos or labels, extend `imageMap` and `labelMap` or provide a `labelFormatter`.
-* **Note:** You can obtain filter cover URLs by right-clicking the cover image in Products → References → Brands and selecting “Copy image address”.
-* For advanced logic, invoke your own functions after parsing or wrap widget init in your own script.
+* Add more selectors to `sourceSelectors` to capture additional groups.
+* Extend `imageMap`/`labelMap` or implement `labelFormatter` for custom labels.
+* You can obtain filter cover URLs by right-clicking the cover image in Products → References → Brands and selecting “Copy image address”.
+* For advanced logic, wrap `FilterWidget.init` in your own scripts or post-process rendered lists.
