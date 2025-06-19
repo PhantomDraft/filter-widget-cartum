@@ -78,11 +78,11 @@ class FilterRenderer {
 
     const generalUl = document.createElement('ul');
     generalUl.className = 'frontBrands-list';
-    generalUl.style.cssText = 'overflow: visible; height: 120px;';
+    generalUl.style.overflow = 'visible';
 
     const brandUl = document.createElement('ul');
     brandUl.className = 'frontBrands-list';
-    brandUl.style.cssText = 'overflow: visible; height: 120px;';
+    brandUl.style.overflow = 'visible';
 
     this.options.forEach(opt => {
       const li = document.createElement('li');
@@ -122,9 +122,8 @@ class FilterRenderer {
       }
     });
 
-    // Вставляем списки после текущего контейнера, затем удаляем его
-    this.container.after(generalUl);
     this.container.after(brandUl);
+    this.container.after(generalUl);
     this.container.remove();
 
     console.log('[FilterRenderer] render() done');
