@@ -60,13 +60,15 @@ class FilterRenderer {
    * @param {{[name:string]:string}} imageMap
    * @param {{[name:string]:string}} labelMap
    * @param {(opt:FilterOption)=>string} labelFormatter
+   * @param {boolean} brandLast
    */
-  constructor(options, targetSelector, imageMap = {}, labelMap = {}, labelFormatter = null) {
+  constructor(options, targetSelector, imageMap = {}, labelMap = {}, labelFormatter = null, brandLast = false) {
     this.options       = options;
     this.targetSelector= targetSelector;
     this.imageMap      = imageMap;
     this.labelMap      = labelMap;
     this.labelFormatter= labelFormatter;
+    this.brandLast     = brandLast;
     this.container     = document.querySelector(targetSelector);
     console.log('[FilterRenderer] init target=', targetSelector, 'imageMap=', Object.keys(imageMap));
     if (!this.container) console.warn(`[FilterRenderer] target "${targetSelector}" not found`);
@@ -76,55 +78,80 @@ class FilterRenderer {
     console.log('[FilterRenderer] render() start, options=', this.options.length);
     if (!this.container) return;
 
-    const generalUl = document.createElement('ul');
-    generalUl.className = 'frontBrands-list';
-    generalUl.style.cssText = 'overflow: visible; height: 120px;';
-
-    const brandUl = document.createElement('ul');
-    brandUl.className = 'frontBrands-list';
-    brandUl.style.cssText = 'overflow: visible; height: 120px;';
-
-    this.options.forEach(opt => {
-      const li = document.createElement('li');
-      li.className = 'frontBrands-i';
-
-      const a = document.createElement('a');
-      a.href = opt.url;
-      a.rel = 'nofollow';
-      a.className = 'frontBrands-a filter-block';
-      a.title = opt.name;
-
-      if (this.imageMap[opt.name]) {
-        const img = document.createElement('img');
-        img.src = this.imageMap[opt.name];
-        img.alt = opt.name;
-        img.className = 'frontBrands-img filter-block__img';
-        a.appendChild(img);
-      } else {
-        const span = document.createElement('span');
-        let display = opt.name;
-        if (typeof this.labelFormatter === 'function') {
-          display = this.labelFormatter(opt);
-        } else if (this.labelMap[opt.name]) {
-          display = this.labelMap[opt.name];
-        }
-        span.textContent = display;
-        span.className = 'filter-block__label';
-        a.appendChild(span);
-      }
-
-      li.appendChild(a);
-
-      if (/\/filter\/brand=/.test(opt.url)) {
-        brandUl.appendChild(li);
-      } else {
-        generalUl.appendChild(li);
-      }
-    });
-
-    this.container.after(brandUl);
-    this.container.after(generalUl);
+    const parent = this.container.parentNode;
     this.container.remove();
+
+    if (this.brandLast) {
+      const generalUl = document.createElement('ul');
+      generalUl.className = 'frontBrands-list __collapsed';
+      const brandUl = document.createElement('ul');
+      brandUl.className = 'frontBrands-list __collapsed';
+
+      this.options.forEach(opt => {
+        const li = document.createElement('li');
+        li.className = 'frontBrands-i';
+        // создаём <a> и наполняем
+        const a = document.createElement('a');
+        a.href = opt.url;
+        a.rel  = 'nofollow';
+        a.className = 'frontBrands-a filter-block';
+        a.title = opt.name;
+        if (this.imageMap[opt.name]) {
+          const img = document.createElement('img');
+          img.src       = this.imageMap[opt.name];
+          img.alt       = opt.name;
+          img.className = 'frontBrands-img filter-block__img';
+          a.appendChild(img);
+        } else {
+          const span = document.createElement('span');
+          let display = opt.name;
+          if (typeof this.labelFormatter === 'function') display = this.labelFormatter(opt);
+          else if (this.labelMap[opt.name]) display = this.labelMap[opt.name];
+          span.textContent = display;
+          span.className   = 'filter-block__label';
+          a.appendChild(span);
+        }
+        li.appendChild(a);
+
+        if (/\/filter\/brand=/.test(opt.url)) brandUl.appendChild(li);
+        else generalUl.appendChild(li);
+      });
+
+      parent.appendChild(generalUl);
+      parent.appendChild(brandUl);
+    } else {
+      const singleUl = document.createElement('ul');
+      singleUl.className = 'frontBrands-list __collapsed';
+
+      this.options.forEach(opt => {
+        const li = document.createElement('li');
+        li.className = 'frontBrands-i';
+        const a = document.createElement('a');
+        a.href = opt.url;
+        a.rel  = 'nofollow';
+        a.className = 'frontBrands-a filter-block';
+        a.title = opt.name;
+        if (this.imageMap[opt.name]) {
+          const img = document.createElement('img');
+          img.src       = this.imageMap[opt.name];
+          img.alt       = opt.name;
+          img.className = 'frontBrands-img filter-block__img';
+          a.appendChild(img);
+        } else {
+          const span = document.createElement('span');
+          let display = opt.name;
+          if (typeof this.labelFormatter === 'function') display = this.labelFormatter(opt);
+          else if (this.labelMap[opt.name]) display = this.labelMap[opt.name];
+          span.textContent = display;
+          span.className   = 'filter-block__label';
+          a.appendChild(span);
+        }
+        li.appendChild(a);
+        singleUl.appendChild(li);
+      });
+
+      parent.appendChild(singleUl);
+    }
 
     console.log('[FilterRenderer] render() done');
   }
@@ -134,103 +161,57 @@ class FilterRenderer {
 class FilterWidget {
   /**
    * @param {Object} config
-   * @param {string[]} config.sourceSelectors   — CSS selectors for UL filter lists
-   * @param {string}   config.targetSelector    — CSS selector for UL.frontBrands-list
+   * @param {string[]} config.sourceSelectors
+   * @param {string}   config.targetSelector
    * @param {boolean}  [config.hideOutOfStock=false]
    * @param {{[name:string]:string}} [config.imageMap={}]
-   * @param {string}   [config.catalogUrl]      — URL to fetch catalog HTML
+   * @param {string}   [config.catalogUrl]
    * @param {boolean}  [config.autoExpand=false]
    * @param {boolean}  [config.disableExpander=false]
    * @param {boolean}  [config.brandLast=false]
-   * @param {string|string[]} [config.runOn='home'] — 'home' | 'all' | ['/path1',...]
+   * @param {string|string[]} [config.runOn='home']
    */
   static init(config) {
     console.log('[FilterWidget] init config=', config);
-
-    // Basic validation
-    if (
-      !config ||
-      !Array.isArray(config.sourceSelectors) ||
-      typeof config.targetSelector !== 'string'
-    ) {
+    if (!config || !Array.isArray(config.sourceSelectors) || typeof config.targetSelector !== 'string') {
       console.error('[FilterWidget] invalid config', config);
       return;
     }
-
-    // runOn check
     const path = window.location.pathname;
     const runOn = config.runOn ?? 'home';
-    console.log('[FilterWidget] runOn=', runOn, 'path=', path);
-    if (runOn === 'home' && path !== '/') {
-      console.log('[FilterWidget] skipping, not homepage');
-      return;
-    }
+    if (runOn === 'home' && path !== '/') return;
     if (runOn !== 'home' && runOn !== 'all') {
       const arr = Array.isArray(runOn) ? runOn : [runOn];
-      if (!arr.includes(path)) {
-        console.log('[FilterWidget] skipping, path not in runOn list');
-        return;
-      }
+      if (!arr.includes(path)) return;
     }
-
-    // Document processing function
     const processDoc = doc => {
-      console.log('[FilterWidget] processing document');
       const opts = new FilterParser(doc, config.sourceSelectors, config.hideOutOfStock).parse();
-
       const target = document.querySelector(config.targetSelector);
-      console.log('[FilterWidget] found target element', target);
       if (!target) return;
-
-      // autoExpand: remove inline height/overflow and CSS toggle class
       if (config.autoExpand) {
-        console.log('[FilterWidget] applying autoExpand');
-        target.style.removeProperty('height');
-        target.style.overflow = 'visible';
-        target.classList.remove('__toggle');
+        target.classList.remove('__collapsed');
+        target.classList.add('__expanded');
       }
-      // disableExpander: hide "show more" button
       if (config.disableExpander) {
-        console.log('[FilterWidget] disabling expander');
         const btn = document.querySelector('.frontBrands-expander a');
-        if (btn) btn.style.display = 'none';
+        if (btn) btn.classList.add('hidden');
       }
-
       const renderer = new FilterRenderer(
         opts,
         config.targetSelector,
         config.imageMap     || {},
         config.labelMap     || {},
-        config.labelFormatter || null
+        config.labelFormatter || null,
+        config.brandLast
       );
       renderer.render();
-
-      if (config.brandLast) {
-        const container = document.querySelector(config.targetSelector);
-        container.querySelectorAll('li.frontBrands-i').forEach(li => {
-          const a = li.querySelector('a');
-          if (a && /\/filter\/brand=/.test(a.getAttribute('href') || '')) {
-            container.appendChild(li);
-          }
-        });
-      }
     };
-
-    // Fetch or use current doc
     if (config.catalogUrl) {
-      console.log('[FilterWidget] fetching catalogUrl=', config.catalogUrl);
       fetch(config.catalogUrl, { credentials: 'same-origin' })
         .then(r => r.ok ? r.text() : Promise.reject(r.status))
-        .then(html => {
-          console.log('[FilterWidget] catalog HTML fetched');
-          const doc = new DOMParser().parseFromString(html, 'text/html');
-          processDoc(doc);
-        })
+        .then(html => processDoc(new DOMParser().parseFromString(html, 'text/html')))
         .catch(err => console.error('[FilterWidget] fetch error:', err));
-    } else {
-      console.log('[FilterWidget] using current document');
-      processDoc(document);
-    }
+    } else processDoc(document);
   }
 }
 
