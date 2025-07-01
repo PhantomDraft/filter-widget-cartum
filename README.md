@@ -45,18 +45,29 @@ Learn more on [GitHub](https://github.com/PhantomDraft/filter-widget-cartum) or 
 Also, using the production-ready variant without inline comments:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/filter-widget-cartum@1.0.26/dist/filterWidget.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/filter-widget-cartum@1.0.28/dist/filterWidget.umd.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     FilterWidget.init({
-      runOn          : 'home',                 
-      catalogUrl     : '/kontaktni-linzy/',     
+      runOn: 'home',
+      catalogUrl: '/kontaktni-linzy/',
       sourceSelectors: [
         'section.filter.__listScroll .filter-list ul.filter-lv1'
       ],
-      targetSelector : 'section.frontBrands.__grayscale ul.frontBrands-list',
-      hideOutOfStock : true,
-      labelMap       : {
+      groups: [
+        {
+          // Загальні фільтри (не брендовані)
+          targetSelector: 'section.frontBrands.__grayscale ul.frontBrands-list',
+          match: opt => !/\/filter\/brand=/.test(opt.url)
+        },
+        {
+          // Тільки брендовані фільтри
+          targetSelector: 'section.banners.banners--block.banners--gaps-none .banner-image',
+          match: opt => /\/filter\/brand=/.test(opt.url)
+        }
+      ],
+      hideOutOfStock: true,
+      labelMap: {
         '1 день'            : 'Одноденні лінзи',
         '1 місяць'          : 'Місячні лінзи',
         '2 тижні'           : 'Двотижневі лінзи',
@@ -71,21 +82,20 @@ Also, using the production-ready variant without inline comments:
         'Денний'            : 'Денні лінзи',
         'Пролонгований'     : 'Пролонговані лінзи'
       },
-      labelFormatter : opt => {
+      labelFormatter: opt => {
         const u = opt.url;
-        if (u.includes('uvFltr='))   return opt.name === 'Ні' ? 'Без UV-фільтра' : 'З UV-фільтром';
+        if (u.includes('uvFltr='))    return opt.name === 'Ні' ? 'Без UV-фільтра' : 'З UV-фільтром';
         if (u.includes('tonuvannja=')) return opt.name === 'Ні' ? 'Без тонування'   : opt.name;
         return opt.name;
       },
-      imageMap       : {
-        'CooperVision'       : '/images/brands/CooperVision.png',
-        'Alcon'              : '/images/brands/Alcon.png',
-        'Bausch & Lomb'      : '/images/brands/Bausch&Lomb.png',
-        'Johnson & Johnson'  : '/images/brands/Johnson&Johnson.png'
+      imageMap: {
+        'CooperVision'      : '/content/images/47/137x120l75nn0/coopervision-80176384117891.webp?884',
+        'Alcon'             : '/content/images/48/120x120l75nn0/alcon-46644902566954.webp',
+        'Bausch & Lomb'     : '/content/images/49/120x120l75nn0/bausch-lomb-23791386782850.webp',
+        'Johnson & Johnson' : '/content/images/50/120x120l75nn0/johnson-johnson-99333620756049.jpg'
       },
-      autoExpand     : true,
-      expanderText   : 'Розгорнути',
-      brandLast      : true
+      autoExpand: true,
+      expanderText: 'Розгорнути'
     });
   });
 </script>
