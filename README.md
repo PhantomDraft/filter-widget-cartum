@@ -20,7 +20,12 @@ Learn more on [GitHub](https://github.com/PhantomDraft/filter-widget-cartum) or 
       sourceSelectors: [
         'section.filter.__listScroll .filter-list ul.filter-lv1'
       ],
-      targetSelector : 'section.frontBrands.__grayscale ul.frontBrands-list',
+      groups        : [                                     // render filters into different blocks
+        { targetSelector: 'section.frontBrands.__grayscale ul.frontBrands-list',
+          match: opt => !/\/filter\/brand=/.test(opt.url) },
+        { targetSelector: 'section.frontBrands-brands ul.frontBrands-list',
+          match: /\/filter\/brand=/ }
+      ],
       hideOutOfStock : true,                                 // hide options with zero items
       labelMap       : {                                     // override displayed labels
         '1 день'   : 'Одноденні лінзи',
@@ -31,8 +36,7 @@ Learn more on [GitHub](https://github.com/PhantomDraft/filter-widget-cartum) or 
         'Alcon'       : '/images/brands/Alcon.png'
       },
       autoExpand     : false,                                // false = show only one row + expander button; true = show all items
-      expanderText   : 'Показать ещё',                      // text for expander button when autoExpand is false
-      brandLast      : true                                  // render brands group after general filters
+      expanderText   : 'Показать ещё'
     });
   });
 </script>
@@ -97,6 +101,7 @@ Also, using the production-ready variant without inline comments:
 | `catalogUrl`      | `string`                | URL of the catalog page to fetch filters from.                                                 |
 | `sourceSelectors` | `string[]`              | CSS selectors targeting original filter lists.                                                 |
 | `targetSelector`  | `string`                | CSS selector of the `<ul>` to replace with rendered filters.                                   |
+| `groups`          | `Array`                | Advanced: array of `{targetSelector, match}` objects to render options into multiple blocks. |
 | `hideOutOfStock`  | `boolean`               | `true` to omit zero-count options.                                                             |
 | `labelMap`        | `Record<string,string>` | Custom label overrides.                                                                        |
 | `labelFormatter`  | `(option) ⇒ string`     | Function returning label per option; overrides `labelMap`.                                     |

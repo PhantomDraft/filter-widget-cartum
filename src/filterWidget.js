@@ -1,4 +1,3 @@
-// src/filterWidget.js
 // ESM module for npm: export FilterWidget class with full API and debug logs
 
 /** Represents a single filter option */
@@ -77,9 +76,11 @@ class FilterRenderer {
     this.container.remove();
 
     // Helper to create a collapsed UL
+    const baseClass = this.container ? this.container.className : 'frontBrands-list';
     const createList = () => {
       const ul = document.createElement('ul');
-      ul.className = 'frontBrands-list __collapsed';
+      ul.className = baseClass;
+      ul.classList.add('__collapsed');
       return ul;
     };
 
@@ -161,7 +162,8 @@ class FilterWidget {
   /**
    * @param {Object} config
    * @param {string[]} config.sourceSelectors
-   * @param {string}   config.targetSelector
+   * @param {string}   [config.targetSelector]
+   * @param {{targetSelector:string, match:(opt:FilterOption)=>boolean}[]} [config.groups]
    * @param {boolean}  [config.hideOutOfStock=false]
    * @param {{[name:string]:string}} [config.imageMap={}]
    * @param {string}   [config.catalogUrl]
@@ -172,8 +174,14 @@ class FilterWidget {
    */
   static init(config) {
     console.log('[FilterWidget] init config=', config);
-    if (!config || !Array.isArray(config.sourceSelectors) || typeof config.targetSelector !== 'string') {
+    if (!config || !Array.isArray(config.sourceSelectors)) {
       console.error('[FilterWidget] invalid config', config);
+      return;
+    }
+    const hasTarget = typeof config.targetSelector === 'string';
+    const hasGroups = Array.isArray(config.groups) && config.groups.length > 0;
+    if (!hasTarget && !hasGroups) {
+      console.error('[FilterWidget] missing targetSelector or groups', config);
       return;
     }
     const path = window.location.pathname;
@@ -183,21 +191,33 @@ class FilterWidget {
       const arr = Array.isArray(runOn) ? runOn : [runOn];
       if (!arr.includes(path)) return;
     }
+    const matchOpt = (opt, match) => {
+      if (!match) return true;
+      if (typeof match === 'function') return match(opt);
+      if (match instanceof RegExp) return match.test(opt.url);
+      if (typeof match === 'string') return opt.url.includes(match);
+      return false;
+    };
     const processDoc = doc => {
       const opts = new FilterParser(doc, config.sourceSelectors, config.hideOutOfStock).parse();
-      const target = document.querySelector(config.targetSelector);
-      if (!target) return;
-      const renderer = new FilterRenderer(
-        opts,
-        config.targetSelector,
-        config.imageMap     || {},
-        config.labelMap     || {},
-        config.labelFormatter || null,
-        config.brandLast,
-        config.autoExpand,
-        config.expanderText || 'Expand'
-      );
-      renderer.render();
+      const groups = hasGroups ? config.groups : [{ targetSelector: config.targetSelector, match: null, brandLast: config.brandLast }];
+      groups.forEach(g => {
+        const subset = opts.filter(o => matchOpt(o, g.match));
+        if (subset.length === 0) return;
+        const target = document.querySelector(g.targetSelector);
+        if (!target) return;
+        const renderer = new FilterRenderer(
+          subset,
+          g.targetSelector,
+          config.imageMap     || {},
+          config.labelMap     || {},
+          config.labelFormatter || null,
+          g.brandLast ?? false,
+          config.autoExpand,
+          config.expanderText || 'Expand'
+        );
+        renderer.render();
+      });
     };
     if (config.catalogUrl) {
       fetch(config.catalogUrl, { credentials: 'same-origin' })
