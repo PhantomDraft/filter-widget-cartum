@@ -167,6 +167,24 @@ Also, using the production-ready variant without inline comments:
 }
 ```
 
+### Horizontal layout for brand items
+
+To make the brand list fill the row in four columns only inside its parent block
+(`section.frontBrands`), use flex layout tied to that container. Other lists
+remain unaffected:
+
+```css
+/* four items per row with gaps */
+section.frontBrands .frontBrands-list {
+  display: flex;
+  flex-wrap: wrap;
+}
+section.frontBrands .frontBrands-i {
+  box-sizing: border-box;
+  flex: 0 0 calc(25% - 16px);
+}
+```
+
 ---
 
 ## Security
