@@ -20,12 +20,7 @@ Learn more on [GitHub](https://github.com/PhantomDraft/filter-widget-cartum) or 
       sourceSelectors: [
         'section.filter.__listScroll .filter-list ul.filter-lv1'
       ],
-      groups        : [                                     // render filters into different blocks
-        { targetSelector: 'section.frontBrands.__grayscale ul.frontBrands-list',
-          match: opt => !/\/filter\/brand=/.test(opt.url) },
-        { targetSelector: 'section.frontBrands-brands ul.frontBrands-list',
-          match: /\/filter\/brand=/ }
-      ],
+      targetSelector : 'section.frontBrands.__grayscale ul.frontBrands-list',                                 // render filters into different blocks
       hideOutOfStock : true,                                 // hide options with zero items
       labelMap       : {                                     // override displayed labels
         '1 день'   : 'Одноденні лінзи',
@@ -54,7 +49,7 @@ Also, using the production-ready variant without inline comments:
       sourceSelectors: [
         'section.filter.__listScroll .filter-list ul.filter-lv1'
       ],
-      groups: [
+      groups: [ // або targetSelector : 'section.frontBrands.__grayscale ul.frontBrands-list',
         {
           // Загальні фільтри (не брендовані)
           targetSelector: 'section.frontBrands.__grayscale ul.frontBrands-list',
