@@ -11,7 +11,7 @@ Learn more on [GitHub](https://github.com/PhantomDraft/filter-widget-cartum) or 
 2. Insert the following code **before** `</body>`:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/filter-widget-cartum@1.0.30/dist/filterWidget.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/filter-widget-cartum@1.0.31/dist/filterWidget.umd.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const widget = new FilterWidget({
@@ -41,7 +41,7 @@ Learn more on [GitHub](https://github.com/PhantomDraft/filter-widget-cartum) or 
 Also, using the production-ready variant without inline comments:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/filter-widget-cartum@1.0.30/dist/filterWidget.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/filter-widget-cartum@1.0.31/dist/filterWidget.umd.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const widget = new FilterWidget({
