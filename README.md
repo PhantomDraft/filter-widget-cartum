@@ -14,7 +14,7 @@ Learn more on [GitHub](https://github.com/PhantomDraft/filter-widget-cartum) or 
 <script src="https://cdn.jsdelivr.net/npm/filter-widget-cartum@1.0.30/dist/filterWidget.umd.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    FilterWidget.init({
+    const widget = new FilterWidget({
       runOn          : 'home',                             // 'home' | 'all' | [ '/path1', '/path2' ]
       catalogUrl     : '/kontaktni-linzy/',                  // URL to fetch catalog filters from
       sourceSelectors: [
@@ -33,6 +33,7 @@ Learn more on [GitHub](https://github.com/PhantomDraft/filter-widget-cartum) or 
       autoExpand     : false,                                // false = show only one row + expander button; true = show all items
       expanderText   : 'Показать ещё'
     });
+    widget.init();
   });
 </script>
 ```
@@ -43,7 +44,7 @@ Also, using the production-ready variant without inline comments:
 <script src="https://cdn.jsdelivr.net/npm/filter-widget-cartum@1.0.30/dist/filterWidget.umd.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    FilterWidget.init({
+    const widget = new FilterWidget({
       runOn: 'home',
       catalogUrl: '/kontaktni-linzy/',
       sourceSelectors: [
@@ -92,6 +93,7 @@ Also, using the production-ready variant without inline comments:
       autoExpand: true,
       expanderText: 'Розгорнути'
     });
+    widget.init();
   });
 </script>
 ```
@@ -201,4 +203,4 @@ section.frontBrands .frontBrands-i {
 * Add more selectors to `sourceSelectors` to capture additional groups.
 * Extend `imageMap`/`labelMap` or implement `labelFormatter` for custom labels.
 * You can obtain filter cover URLs by right-clicking the cover image in Products → References → Brands and selecting “Copy image address”.
-* For advanced logic, wrap `FilterWidget.init` in your own scripts or post-process rendered lists.
+* For advanced logic, create an instance with `new FilterWidget(config)` and call `init()` in your own scripts after post-processing the rendered lists.
