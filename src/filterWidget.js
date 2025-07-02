@@ -9,13 +9,14 @@
 
 /** Represents a single filter option */
 class FilterOption {
-	constructor(name, url, imageUrl = null) {
+	constructor(name, url, imageUrl = null, node = null) {
 		this.name     = String(name);
 		this.url      = String(url);
 		this.imageUrl = imageUrl ? String(imageUrl) : null;
+		this.node     = node;
 		console.log('[FilterOption]', this.name, this.url, this.imageUrl);
 	}
-}
+				}
 
 /** Parses filter lists from a Document */
 class FilterParser {
@@ -39,16 +40,16 @@ class FilterParser {
 					const cnt = sup ? parseInt(sup.textContent, 10) : NaN;
 					if (!isNaN(cnt) && cnt <= 0) return;
 				}
-				const titleEl = li.querySelector('span.filter-title');
-				const name    = titleEl ? titleEl.textContent.trim() : a.textContent.trim();
-				const rawHref = a.getAttribute('data-fake-href') || a.getAttribute('href');
-				out.push(new FilterOption(name, rawHref));
+					const titleEl = li.querySelector('span.filter-title');
+					const name    = titleEl ? titleEl.textContent.trim() : a.textContent.trim();
+					const rawHref = a.getAttribute('data-fake-href') || a.getAttribute('href');
+					out.push(new FilterOption(name, rawHref, null, li));
 			});
 		});
 		console.log('[FilterParser] parse() result count=', out.length);
 		return out;
 	}
-}
+				}
 
 /** Renders the options into the existing brands container */
 class FilterRenderer {
@@ -176,7 +177,7 @@ class FilterRenderer {
 
 		console.log('[FilterRenderer] render() done');
 	}
-}
+				}
 
 /** Main widget controller */
 class FilterWidget {
@@ -195,17 +196,18 @@ class FilterWidget {
  * @param {string} [config.titleTag='span'] Tag name for the heading wrapper.
  * @param {string} [config.titleClass] Class name for the heading wrapper.
  * @param {string|string[]} [config.runOn='home'] Pages on which to run the widget.
+ * @param {boolean} [config.clone=true] Clone items instead of moving them.
  */
 constructor(config) {
 console.log('[FilterWidget] constructor config=', config);
 if (!config || !Array.isArray(config.sourceSelectors)) {
 throw new Error('[FilterWidget] invalid config');
-}
+				}
 const hasTarget = typeof config.targetSelector === 'string';
 const hasGroups = Array.isArray(config.groups) && config.groups.length > 0;
 if (!hasTarget && !hasGroups) {
 throw new Error('[FilterWidget] missing targetSelector or groups');
-}
+				}
 this.config = {
 imageMap: {},
 labelMap: {},
@@ -217,24 +219,25 @@ title: '',
 titleTag: 'span',
 titleClass: '',
 runOn: 'home',
+clone: true,
 ...config
-};
-}
+				};
+				}
 
 /** Initialize the widget according to the provided configuration. */
 init() {
 if (!this.#shouldRun()) {
 return;
-}
+				}
 if (this.config.catalogUrl) {
 fetch(this.config.catalogUrl, { credentials: 'same-origin' })
 .then(r => (r.ok ? r.text() : Promise.reject(r.status)))
 .then(html => this.#processDoc(new DOMParser().parseFromString(html, 'text/html')))
 .catch(err => console.error('[FilterWidget] fetch error:', err));
-} else {
+				} else {
 this.#processDoc(document);
-}
-}
+				}
+				}
 
 /** Determine whether the widget should run on the current page. */
 #shouldRun() {
@@ -242,15 +245,15 @@ const path = window.location.pathname;
 const runOn = this.config.runOn;
 if (runOn === 'home' && path !== '/') {
 return false;
-}
+				}
 if (runOn !== 'home' && runOn !== 'all') {
 const arr = Array.isArray(runOn) ? runOn : [runOn];
 if (!arr.includes(path)) {
 return false;
-}
-}
+				}
+				}
 return true;
-}
+				}
 
 /**
  * Check if an option matches a condition.
@@ -264,7 +267,7 @@ if (typeof match === 'function') return match(opt);
 if (match instanceof RegExp) return match.test(opt.url);
 if (typeof match === 'string') return opt.url.includes(match);
 return false;
-}
+				}
 
 /**
  * Parse filters from the given document and render them.
@@ -280,6 +283,12 @@ const subset = opts.filter(o => this.#matchOpt(o, g.match));
 if (subset.length === 0) return;
 const target = document.querySelector(g.targetSelector);
 if (!target) return;
+				const doClone = g.clone ?? cfg.clone;
+				if (!doClone) {
+				subset.forEach(o => {
+					if (o.node && o.node.parentNode) o.node.remove();
+				});
+				}
 const renderer = new FilterRenderer(
        subset,
        g.targetSelector,
@@ -294,19 +303,19 @@ const renderer = new FilterRenderer(
        g.titleClass ?? cfg.titleClass
 );
 renderer.render();
-});
-}
+				});
+				}
 
 /** Shortcut to create and immediately run the widget. */
 static init(config) {
 const widget = new FilterWidget(config);
 widget.init();
 return widget;
-}
-}
+				}
+				}
 
 if (typeof window !== 'undefined') {
 window.FilterWidget = FilterWidget;
-}
+				}
 
 export default FilterWidget;

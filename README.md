@@ -11,7 +11,7 @@ Learn more on [GitHub](https://github.com/PhantomDraft/filter-widget-cartum) or 
 2. Insert the following code **before** `</body>`:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/filter-widget-cartum@1.0.32/dist/filterWidget.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/filter-widget-cartum@1.0.31/dist/filterWidget.umd.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const widget = new FilterWidget({
@@ -42,7 +42,7 @@ Learn more on [GitHub](https://github.com/PhantomDraft/filter-widget-cartum) or 
 Also, using the production-ready variant without inline comments:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/filter-widget-cartum@1.0.32/dist/filterWidget.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/filter-widget-cartum@1.0.31/dist/filterWidget.umd.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const widget = new FilterWidget({
@@ -122,6 +122,7 @@ Also, using the production-ready variant without inline comments:
 | `titleTag`        | `string`                | Wrapper tag name for the heading. Default `'span'`.                                           |
 | `titleClass`      | `string`                | CSS class for the heading wrapper.                                                           |
 | `brandLast`       | `boolean`               | `true` to render brand filters in a separate second list after general filters.                |
+| `clone`           | `boolean`               | `true` to duplicate items instead of removing them from the source lists. |
 
 ---
 
@@ -210,3 +211,47 @@ section.frontBrands .frontBrands-i {
 * Extend `imageMap`/`labelMap` or implement `labelFormatter` for custom labels.
 * You can obtain filter cover URLs by right-clicking the cover image in Products → References → Brands and selecting “Copy image address”.
 * For advanced logic, create an instance with `new FilterWidget(config)` and call `init()` in your own scripts after post-processing the rendered lists.
+
+### Example: cloning filters into a custom menu
+
+With the default `clone` behaviour enabled, you can duplicate selected options and place them into any list while keeping them in their original block. The snippet below adds three cloned items to an existing menu:
+
+```html
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    FilterWidget.init({
+      catalogUrl: "/kontaktni-linzy/",
+      sourceSelectors: [
+        "section.filter.__listScroll .filter-list ul.filter-lv1"
+      ],
+      groups: [
+        {
+          targetSelector: ".products-menu__container",
+          match: opt => ["1 день", "Ні", "Гнучкий"].includes(opt.name)
+          // clone defaults to true
+        },
+        {
+          targetSelector: "section.frontBrands.__grayscale ul.frontBrands-list"
+        }
+      ],
+      labelMap: {
+        "1 день": "Однодневные",
+        "Ні": "Без UV-фільтра",
+        "Гнучкий": "Гибкие"
+      }
+    });
+  });
+</script>
+```
+
+Resulting markup inside `.products-menu__container`:
+
+```html
+<ul class="products-menu__container">
+  <li class="products-menu__item j-submenu-item">…</li>
+  <li class="frontBrands-i"><a href="/kontaktni-linzy/filter/rezhimZamni=1/" class="frontBrands-a filter-block"><span class="filter-block__label">Однодневные</span></a></li>
+  <li class="frontBrands-i"><a href="/kontaktni-linzy/filter/uvFltr=no/" class="frontBrands-a filter-block"><span class="filter-block__label">Без UV-фільтра</span></a></li>
+  <li class="frontBrands-i"><a href="/kontaktni-linzy/filter/rezhimNosnnja=1/" class="frontBrands-a filter-block"><span class="filter-block__label">Гибкие</span></a></li>
+  <li class="products-menu__item j-submenu-item">…</li>
+</ul>
+```
