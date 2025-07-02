@@ -83,12 +83,8 @@ Also, using the production-ready variant without inline comments:
         'Денний'            : 'Денні лінзи',
         'Пролонгований'     : 'Пролонговані лінзи'
       },
-      labelFormatter: opt => {
-        const u = opt.url;
-        if (u.includes('uvFltr='))    return opt.name === 'Ні' ? 'Без UV-фільтра' : 'З UV-фільтром';
-        if (u.includes('tonuvannja=')) return opt.name === 'Ні' ? 'Без тонування'   : opt.name;
-        return opt.name;
-      },
+      // Add a formatter only if custom logic is needed.
+      // See the "Extending and Customization" section for examples.
       imageMap: {
         'CooperVision'      : '/content/images/47/137x120l75nn0/coopervision-80176384117891.webp?884',
         'Alcon'             : '/content/images/48/120x120l75nn0/alcon-46644902566954.webp',
@@ -236,7 +232,72 @@ Resulting markup inside `.products-menu__container`:
 </ul>
 ```
 
-### Example 2: Horizontal layout for brand items
+### Example 2: Combining `labelMap` and `labelFormatter`
+
+You can override individual names via `labelMap` and still apply conditional
+transformations in `labelFormatter`.
+
+```html
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    FilterWidget.init({
+      catalogUrl: '/kontaktni-linzy/',
+      labelMap: {
+        '1 день': 'Daily lenses',
+        '1 місяць': 'Monthly lenses'
+      },
+      labelFormatter(opt) {
+        const u = opt.url;
+        if (u.includes('uvFltr=')) {
+          return opt.name === 'Ні' ? 'Without UV filter' : 'With UV filter';
+        }
+        return this.labelMap[opt.name] || opt.name;
+      }
+    });
+  });
+</script>
+```
+
+### Example 3: Shortening long names
+
+```html
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    FilterWidget.init({
+      catalogUrl: '/kontaktni-linzy/',
+      labelMap: {
+        'Johnson & Johnson': 'J&J'
+      },
+      labelFormatter(opt) {
+        const mapped = this.labelMap[opt.name];
+        if (mapped) return mapped;
+        return opt.name.length > 12 ? opt.name.slice(0, 12) + '…' : opt.name;
+      }
+    });
+  });
+</script>
+```
+
+### Example 4: Prefixing every label
+
+```html
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    FilterWidget.init({
+      catalogUrl: '/kontaktni-linzy/',
+      labelMap: {
+        'Гнучкий': 'Flexible',
+        'Денний': 'Daily wear'
+      },
+      labelFormatter(opt) {
+        return '★ ' + (this.labelMap[opt.name] || opt.name);
+      }
+    });
+  });
+</script>
+```
+
+### Example 5: Horizontal layout for brand items
 
 To make the brand list fill the row in four columns only inside its parent block
 (`section.frontBrands`), use flex layout tied to that container. Other lists
