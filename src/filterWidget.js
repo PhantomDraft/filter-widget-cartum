@@ -59,28 +59,42 @@ class FilterRenderer {
 	 * @param {{[name:string]:string}} labelMap
 	 * @param {(opt:FilterOption)=>string} labelFormatter
 	 * @param {boolean} brandLast
-	 * @param {boolean} autoExpand
-	 * @param {string} expanderText
-	 */
-	constructor(options, targetSelector, imageMap = {}, labelMap = {}, labelFormatter = null, brandLast = false, autoExpand = false, expanderText = 'Expand') {
-		this.options       = options;
-		this.targetSelector= targetSelector;
-		this.imageMap      = imageMap;
-		this.labelMap      = labelMap;
-		this.labelFormatter= labelFormatter;
-		this.brandLast     = brandLast;
-		this.autoExpand    = autoExpand;
-		this.expanderText  = expanderText;
-		this.container     = document.querySelector(targetSelector);
-		console.log('[FilterRenderer] init target=', targetSelector, 'imageMap=', Object.keys(imageMap));
-		if (!this.container) console.warn(`[FilterRenderer] target "${targetSelector}" not found`);
-	}
+       * @param {boolean} autoExpand
+       * @param {string} expanderText
+       * @param {string} title
+       * @param {string} titleTag
+       * @param {string} titleClass
+       */
+       constructor(options, targetSelector, imageMap = {}, labelMap = {}, labelFormatter = null, brandLast = false, autoExpand = false, expanderText = 'Expand', title = '', titleTag = 'span', titleClass = '') {
+               this.options       = options;
+               this.targetSelector= targetSelector;
+               this.imageMap      = imageMap;
+               this.labelMap      = labelMap;
+               this.labelFormatter= labelFormatter;
+               this.brandLast     = brandLast;
+               this.autoExpand    = autoExpand;
+               this.expanderText  = expanderText;
+               this.title         = String(title || '');
+               this.titleTag      = String(titleTag || 'span');
+               this.titleClass    = String(titleClass || '');
+               this.container     = document.querySelector(targetSelector);
+               console.log('[FilterRenderer] init target=', targetSelector, 'imageMap=', Object.keys(imageMap));
+               if (!this.container) console.warn(`[FilterRenderer] target "${targetSelector}" not found`);
+       }
 
 	render() {
 		console.log('[FilterRenderer] render() start, options=', this.options.length);
 		if (!this.container) return;
-		const parent = this.container.parentNode;
-		this.container.remove();
+               const parent = this.container.parentNode;
+               this.container.remove();
+
+               // Optional title before the list(s)
+               if (this.title) {
+                       const h = document.createElement(this.titleTag);
+                       if (this.titleClass) h.className = this.titleClass;
+                       h.textContent = this.title;
+                       parent.appendChild(h);
+               }
 
 		// Helper to create a collapsed UL
 		const baseClass = this.container ? this.container.className : 'frontBrands-list';
@@ -170,13 +184,16 @@ class FilterWidget {
  * @param {Object} config Configuration object for the widget.
  * @param {string[]} config.sourceSelectors CSS selectors of the original filter lists.
  * @param {string} [config.targetSelector] Selector of the block to replace.
- * @param {{targetSelector:string, match:(opt:FilterOption)=>boolean, brandLast?:boolean}[]} [config.groups]
+ * @param {{targetSelector:string, match:(opt:FilterOption)=>boolean, brandLast?:boolean, title?:string, titleTag?:string, titleClass?:string}[]} [config.groups]
  * @param {boolean} [config.hideOutOfStock=false] Hide options with zero count.
  * @param {{[name:string]:string}} [config.imageMap={}] Mapping of option names to image URLs.
  * @param {string} [config.catalogUrl] URL of the catalog page to fetch filters from.
  * @param {boolean} [config.autoExpand=false] Expand the list immediately without an expander button.
  * @param {boolean} [config.brandLast=false] Place brand filters after general filters.
  * @param {string} [config.expanderText='Expand'] Text for the expander button.
+ * @param {string} [config.title] Optional heading text before the list.
+ * @param {string} [config.titleTag='span'] Tag name for the heading wrapper.
+ * @param {string} [config.titleClass] Class name for the heading wrapper.
  * @param {string|string[]} [config.runOn='home'] Pages on which to run the widget.
  */
 constructor(config) {
@@ -196,6 +213,9 @@ hideOutOfStock: false,
 autoExpand: false,
 brandLast: false,
 expanderText: 'Expand',
+title: '',
+titleTag: 'span',
+titleClass: '',
 runOn: 'home',
 ...config
 };
@@ -254,21 +274,24 @@ return false;
 const cfg = this.config;
 const opts = new FilterParser(doc, cfg.sourceSelectors, cfg.hideOutOfStock).parse();
 const hasGroups = Array.isArray(cfg.groups) && cfg.groups.length > 0;
-const groups = hasGroups ? cfg.groups : [{ targetSelector: cfg.targetSelector, match: null, brandLast: cfg.brandLast }];
+const groups = hasGroups ? cfg.groups : [{ targetSelector: cfg.targetSelector, match: null, brandLast: cfg.brandLast, title: cfg.title, titleTag: cfg.titleTag, titleClass: cfg.titleClass }];
 groups.forEach(g => {
 const subset = opts.filter(o => this.#matchOpt(o, g.match));
 if (subset.length === 0) return;
 const target = document.querySelector(g.targetSelector);
 if (!target) return;
 const renderer = new FilterRenderer(
-subset,
-g.targetSelector,
-cfg.imageMap,
-cfg.labelMap,
-cfg.labelFormatter || null,
-g.brandLast ?? false,
-cfg.autoExpand,
-cfg.expanderText
+       subset,
+       g.targetSelector,
+       cfg.imageMap,
+       cfg.labelMap,
+       cfg.labelFormatter || null,
+       g.brandLast ?? false,
+       cfg.autoExpand,
+       cfg.expanderText,
+       g.title ?? cfg.title,
+       g.titleTag ?? cfg.titleTag,
+       g.titleClass ?? cfg.titleClass
 );
 renderer.render();
 });

@@ -11,7 +11,7 @@ Learn more on [GitHub](https://github.com/PhantomDraft/filter-widget-cartum) or 
 2. Insert the following code **before** `</body>`:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/filter-widget-cartum@1.0.31/dist/filterWidget.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/filter-widget-cartum@1.0.32/dist/filterWidget.umd.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const widget = new FilterWidget({
@@ -31,7 +31,8 @@ Learn more on [GitHub](https://github.com/PhantomDraft/filter-widget-cartum) or 
         'Alcon'       : '/images/brands/Alcon.png'
       },
       autoExpand     : false,                                // false = show only one row + expander button; true = show all items
-      expanderText   : 'Показать ещё'
+      expanderText   : 'Показать ещё',
+      title          : 'Бренды'
     });
     widget.init();
   });
@@ -41,7 +42,7 @@ Learn more on [GitHub](https://github.com/PhantomDraft/filter-widget-cartum) or 
 Also, using the production-ready variant without inline comments:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/filter-widget-cartum@1.0.31/dist/filterWidget.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/filter-widget-cartum@1.0.32/dist/filterWidget.umd.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const widget = new FilterWidget({
@@ -54,12 +55,14 @@ Also, using the production-ready variant without inline comments:
         {
           // Загальні фільтри (не брендовані)
           targetSelector: 'section.frontBrands.__grayscale ul.frontBrands-list',
-          match: opt => !/\/filter\/brand=/.test(opt.url)
+          match: opt => !/\/filter\/brand=/.test(opt.url),
+          title: 'Типи'
         },
         {
           // Тільки брендовані фільтри
           targetSelector: 'section.banners.banners--block.banners--gaps-none .banner-image',
-          match: opt => /\/filter\/brand=/.test(opt.url)
+          match: opt => /\/filter\/brand=/.test(opt.url),
+          title: 'Бренди'
         }
       ],
       hideOutOfStock: true,
@@ -108,13 +111,16 @@ Also, using the production-ready variant without inline comments:
 | `catalogUrl`      | `string`                | URL of the catalog page to fetch filters from.                                                 |
 | `sourceSelectors` | `string[]`              | CSS selectors targeting original filter lists.                                                 |
 | `targetSelector`  | `string`                | CSS selector of the `<ul>` to replace with rendered filters.                                   |
-| `groups`          | `Array`                | Advanced: array of `{targetSelector, match}` objects to render options into multiple blocks. |
+| `groups`          | `Array`                | Advanced: array of `{targetSelector, match, title?}` objects to render options into multiple blocks. |
 | `hideOutOfStock`  | `boolean`               | `true` to omit zero-count options.                                                             |
 | `labelMap`        | `Record<string,string>` | Custom label overrides.                                                                        |
 | `labelFormatter`  | `(option) ⇒ string`     | Function returning label per option; overrides `labelMap`.                                     |
 | `imageMap`        | `Record<string,string>` | Mapping option names to logo image URLs.                                                       |
 | `autoExpand`      | `boolean`               | `false` = render a single collapsed row + expander button; `true` = render all items expanded. |
 | `expanderText`    | `string`                | Text of the “Show more” button when `autoExpand` is `false`.                                   |
+| `title`           | `string`                | Optional heading text before the rendered list. Empty to omit.                               |
+| `titleTag`        | `string`                | Wrapper tag name for the heading. Default `'span'`.                                           |
+| `titleClass`      | `string`                | CSS class for the heading wrapper.                                                           |
 | `brandLast`       | `boolean`               | `true` to render brand filters in a separate second list after general filters.                |
 
 ---
