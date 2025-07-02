@@ -11,7 +11,7 @@ Learn more on [GitHub](https://github.com/PhantomDraft/filter-widget-cartum) or 
 2. Insert the following code **before** `</body>`:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/filter-widget-cartum@1.0.33/dist/filterWidget.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/filter-widget-cartum@1.0.35/dist/filterWidget.umd.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const widget = new FilterWidget({
@@ -42,7 +42,7 @@ Learn more on [GitHub](https://github.com/PhantomDraft/filter-widget-cartum) or 
 Also, using the production-ready variant without inline comments:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/filter-widget-cartum@1.0.33/dist/filterWidget.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/filter-widget-cartum@1.0.35/dist/filterWidget.umd.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const widget = new FilterWidget({
@@ -53,17 +53,19 @@ Also, using the production-ready variant without inline comments:
       ],
       groups: [ // або targetSelector : 'section.frontBrands.__grayscale ul.frontBrands-list',
         {
-          // Загальні фільтри (не брендовані)
+          // General filters (not branded)
           targetSelector: 'section.frontBrands.__grayscale ul.frontBrands-list',
           match: opt => !/\/filter\/brand=/.test(opt.url),
           title: 'Типи'
         },
         {
-          // Тільки брендовані фільтри
+          // Only branded filters
           targetSelector: 'section.banners.banners--block.banners--gaps-none .banner-image',
           match: opt => /\/filter\/brand=/.test(opt.url),
           title: 'Бренди'
         }
+        // You can display any elements taken by the parser in any places and style them
+        // see Extending and Customization - Example 1: Cloning filters into a custom menu for more details
       ],
       hideOutOfStock: true,
       labelMap: {
@@ -125,7 +127,7 @@ Also, using the production-ready variant without inline comments:
 | `clone`           | `boolean`               | `true` to duplicate items instead of removing them from the source lists. |
 | `insertMode`      | `string`                | `'replace'` (default) to overwrite the target or `'append'` to keep its contents. |
 | `afterSelector`   | `string`                | When appending, insert new lists after the element matching this selector. |
-| `markup`          | `object`                | Customize classes and tags: `{listClass,itemTag,itemClass,linkTag,linkClass,imgClass,labelTag,labelClass}` |
+| `markup`          | `object`                | Customize classes and tags: `{listClass, itemTag, itemClass, linkTag, linkClass, imgClass, labelTag, labelClass}` |
 
 ---
 
@@ -179,7 +181,62 @@ Also, using the production-ready variant without inline comments:
 }
 ```
 
-### Horizontal layout for brand items
+---
+
+## Extending and Customization
+
+* Add more selectors to `sourceSelectors` to capture additional groups.
+* Extend `imageMap`/`labelMap` or implement `labelFormatter` for custom labels.
+* You can obtain filter cover URLs by right-clicking the cover image in Products → References → Brands and selecting “Copy image address”.
+* For advanced logic, create an instance with `new FilterWidget(config)` and call `init()` in your own scripts after post-processing the rendered lists.
+
+### Example 1: Cloning filters into a custom menu
+
+With the default `clone` behaviour enabled, you can duplicate selected options and place them into any list while keeping them in their original block. The snippet below adds three cloned items to an existing menu:
+
+```html
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    FilterWidget.init({
+      catalogUrl: "/kontaktni-linzy/",
+      sourceSelectors: [
+        "section.filter.__listScroll .filter-list ul.filter-lv1"
+      ],
+      groups: [
+        {
+          targetSelector: ".products-menu__container",
+          match: opt => ["1 день", "Ні", "Гнучкий"].includes(opt.name),
+          insertMode: 'append',
+          afterSelector: 'li',
+          markup: {
+            itemTag: 'li',
+            itemClass: 'products-menu__item j-submenu-item'
+          }
+        }
+      ],
+      labelMap: {
+        "1 день": "Однодневные",
+        "Ні": "Без UV-фільтра",
+        "Гнучкий": "Гибкие"
+      }
+    });
+  });
+</script>
+```
+
+Resulting markup inside `.products-menu__container`:
+
+```html
+<ul class="products-menu__container">
+  <li class="products-menu__item j-submenu-item">…</li>
+  <li class="frontBrands-i"><a href="/kontaktni-linzy/filter/rezhimZamni=1/" class="frontBrands-a filter-block"><span class="filter-block__label">Однодневные</span></a></li>
+  <li class="frontBrands-i"><a href="/kontaktni-linzy/filter/uvFltr=no/" class="frontBrands-a filter-block"><span class="filter-block__label">Без UV-фільтра</span></a></li>
+  <li class="frontBrands-i"><a href="/kontaktni-linzy/filter/rezhimNosnnja=1/" class="frontBrands-a filter-block"><span class="filter-block__label">Гибкие</span></a></li>
+  <li class="products-menu__item j-submenu-item">…</li>
+</ul>
+```
+
+### Example 2: Horizontal layout for brand items
 
 To make the brand list fill the row in four columns only inside its parent block
 (`section.frontBrands`), use flex layout tied to that container. Other lists
@@ -205,52 +262,3 @@ section.frontBrands .frontBrands-i {
 * Links are given `rel="nofollow"`.
 * Errors are caught so the widget won’t break your page.
 * All parameters validated on init.
-
----
-
-## Extending and Customization
-
-* Add more selectors to `sourceSelectors` to capture additional groups.
-* Extend `imageMap`/`labelMap` or implement `labelFormatter` for custom labels.
-* You can obtain filter cover URLs by right-clicking the cover image in Products → References → Brands and selecting “Copy image address”.
-* For advanced logic, create an instance with `new FilterWidget(config)` and call `init()` in your own scripts after post-processing the rendered lists.
-
-### Example: cloning filters into a custom menu
-
-With the default `clone` behaviour enabled, you can duplicate selected options and place them into any list while keeping them in their original block. The snippet below adds three cloned items to an existing menu:
-
-```html
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    FilterWidget.init({
-      catalogUrl: "/kontaktni-linzy/",
-      sourceSelectors: [
-        "section.filter.__listScroll .filter-list ul.filter-lv1"
-      ],
-      groups: [
-        {
-          targetSelector: ".products-menu__container",
-          match: opt => ["1 день", "Ні", "Гнучкий"].includes(opt.name)
-          // clone defaults to true
-        },
-        {
-      labelMap: {
-        "1 день": "Однодневные",
-        "Ні": "Без UV-фільтра",
-        "Гнучкий": "Гибкие"
-      }
-    });
-  });
-</script>
-```
-
-Resulting markup inside `.products-menu__container`:
-
-```html
-<ul class="products-menu__container">
-  <li class="products-menu__item j-submenu-item">…</li>
-  <li class="frontBrands-i"><a href="/kontaktni-linzy/filter/rezhimZamni=1/" class="frontBrands-a filter-block"><span class="filter-block__label">Однодневные</span></a></li>
-  <li class="frontBrands-i"><a href="/kontaktni-linzy/filter/uvFltr=no/" class="frontBrands-a filter-block"><span class="filter-block__label">Без UV-фільтра</span></a></li>
-  <li class="frontBrands-i"><a href="/kontaktni-linzy/filter/rezhimNosnnja=1/" class="frontBrands-a filter-block"><span class="filter-block__label">Гибкие</span></a></li>
-  <li class="products-menu__item j-submenu-item">…</li>
-</ul>
