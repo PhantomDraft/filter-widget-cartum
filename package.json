@@ -8,6 +8,7 @@
   "scripts": {
     "build": "rollup -c",
     "prepublishOnly": "npm run build",
+    "format": "prettier --write \"src/**/*.js\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -32,6 +33,9 @@
     "@babel/preset-env": "^7.27.2",
     "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-node-resolve": "^16.0.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.2",
+    "prettier": "^3.6.2",
     "rollup": "^4.43.0"
   }
 }

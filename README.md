@@ -11,7 +11,7 @@ Learn more on [GitHub](https://github.com/PhantomDraft/filter-widget-cartum) or 
 2. Insert the following code **before** `</body>`:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/filter-widget-cartum@1.0.32/dist/filterWidget.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/filter-widget-cartum@1.0.33/dist/filterWidget.umd.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const widget = new FilterWidget({
@@ -42,7 +42,7 @@ Learn more on [GitHub](https://github.com/PhantomDraft/filter-widget-cartum) or 
 Also, using the production-ready variant without inline comments:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/filter-widget-cartum@1.0.32/dist/filterWidget.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/filter-widget-cartum@1.0.33/dist/filterWidget.umd.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const widget = new FilterWidget({
@@ -123,6 +123,9 @@ Also, using the production-ready variant without inline comments:
 | `titleClass`      | `string`                | CSS class for the heading wrapper.                                                           |
 | `brandLast`       | `boolean`               | `true` to render brand filters in a separate second list after general filters.                |
 | `clone`           | `boolean`               | `true` to duplicate items instead of removing them from the source lists. |
+| `insertMode`      | `string`                | `'replace'` (default) to overwrite the target or `'append'` to keep its contents. |
+| `afterSelector`   | `string`                | When appending, insert new lists after the element matching this selector. |
+| `markup`          | `object`                | Customize classes and tags: `{listClass,itemTag,itemClass,linkTag,linkClass,imgClass,labelTag,labelClass}` |
 
 ---
 
@@ -231,9 +234,6 @@ With the default `clone` behaviour enabled, you can duplicate selected options a
           // clone defaults to true
         },
         {
-          targetSelector: "section.frontBrands.__grayscale ul.frontBrands-list"
-        }
-      ],
       labelMap: {
         "1 день": "Однодневные",
         "Ні": "Без UV-фільтра",
@@ -254,4 +254,3 @@ Resulting markup inside `.products-menu__container`:
   <li class="frontBrands-i"><a href="/kontaktni-linzy/filter/rezhimNosnnja=1/" class="frontBrands-a filter-block"><span class="filter-block__label">Гибкие</span></a></li>
   <li class="products-menu__item j-submenu-item">…</li>
 </ul>
-```
